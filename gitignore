@@ -1,0 +1,15 @@
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+node_modules/
+
+*.zip
+dist/
+build/
+
+*.log
+npm-debug.log*

@@ -1,0 +1,274 @@
+{
+  "extName": {
+    "message": "AI Guard — Sensitive Content Detection & Alert",
+    "description": "Extension name"
+  },
+  "extDesc": {
+    "message": "Detect sensitive keywords in AI chat inputs — real-time highlighting, warnings, and configurable send blocking.",
+    "description": "Extension description"
+  },
+  "popupSubtitle": {
+    "message": "Sensitive content detection & alert",
+    "description": "Popup header subtitle"
+  },
+  "toggleEnabled": {
+    "message": "Enable Detection",
+    "description": "Enable/disable toggle label"
+  },
+  "toggleVisual": {
+    "message": "Highlight + Warning Bar",
+    "description": "Visual warning toggle label"
+  },
+  "toggleBlockSend": {
+    "message": "Block Send",
+    "description": "Block send toggle label"
+  },
+  "openOptions": {
+    "message": "Customize Rules (Options Page)",
+    "description": "Open options page button"
+  },
+  "ruleStat": {
+    "message": "Active rules: {count}",
+    "description": "Rule count stat, {count} is placeholder"
+  },
+  "optionsTitle": {
+    "message": "AI Guard — Rule Configuration",
+    "description": "Options page title"
+  },
+  "optionsDesc": {
+    "message": "Configure sensitive content detection rules. Error level will block sending, warn level will only alert.",
+    "description": "Options page description"
+  },
+  "btnAddRule": {
+    "message": "Add Rule",
+    "description": "Add rule button"
+  },
+  "btnReset": {
+    "message": "Reset to Default",
+    "description": "Reset button"
+  },
+  "btnExport": {
+    "message": "Export",
+    "description": "Export button"
+  },
+  "btnImport": {
+    "message": "Import",
+    "description": "Import button"
+  },
+  "thEnabled": {
+    "message": "On",
+    "description": "Table header: enabled"
+  },
+  "thType": {
+    "message": "Type",
+    "description": "Table header: rule type"
+  },
+  "thPattern": {
+    "message": "Pattern (keyword or regex)",
+    "description": "Table header: match pattern"
+  },
+  "thDesc": {
+    "message": "Description",
+    "description": "Table header: description"
+  },
+  "thSeverity": {
+    "message": "Severity",
+    "description": "Table header: severity"
+  },
+  "thAction": {
+    "message": "Action",
+    "description": "Table header: action"
+  },
+  "typeKeyword": {
+    "message": "Keyword",
+    "description": "Rule type: keyword"
+  },
+  "typeRegex": {
+    "message": "Regex",
+    "description": "Rule type: regex"
+  },
+  "severityError": {
+    "message": "Block",
+    "description": "Severity: error/block"
+  },
+  "severityWarn": {
+    "message": "Warn",
+    "description": "Severity: warn"
+  },
+  "btnDelete": {
+    "message": "Delete",
+    "description": "Delete button"
+  },
+  "placeholderPattern": {
+    "message": "Keyword or regex, e.g. sk-[A-Za-z0-9_-]{20,}",
+    "description": "Rule pattern input placeholder"
+  },
+  "placeholderDesc": {
+    "message": "Description",
+    "description": "Rule description input placeholder"
+  },
+  "testTitle": {
+    "message": "Test Rules",
+    "description": "Test panel title"
+  },
+  "testDesc": {
+    "message": "(Enter sample text to see real-time match results)",
+    "description": "Test panel description"
+  },
+  "testPlaceholder": {
+    "message": "Paste or type test text here... e.g.\nDatabase password: password=MyS3cret!\nOpenAI key: sk-1234567890abcdefghij",
+    "description": "Test textarea placeholder"
+  },
+  "btnFillDemo": {
+    "message": "Load demo text",
+    "description": "Load demo text button"
+  },
+  "btnClearTest": {
+    "message": "Clear",
+    "description": "Clear test button"
+  },
+  "testHint": {
+    "message": "Enter text above to see matching rules and highlighted results in real time.",
+    "description": "Test panel hint"
+  },
+  "testNoHits": {
+    "message": "No rules matched.",
+    "description": "Test result: no hits"
+  },
+  "testSummary": {
+    "message": "{errors} blocked, {warns} warned — {total} match(es):",
+    "description": "Test result summary"
+  },
+  "sitesTitle": {
+    "message": "Site Configuration",
+    "description": "Site config section title"
+  },
+  "sitesDesc": {
+    "message": "(Built-in site adapters cover most AI sites; you can also add custom sites)",
+    "description": "Site config section description"
+  },
+  "builtinToggle": {
+    "message": "Enable built-in sites (ChatGPT / Claude / Copilot / Gemini / Doubao / Yuanbao / Kimi)",
+    "description": "Built-in sites toggle label"
+  },
+  "builtinHint": {
+    "message": "When disabled, only custom sites below will be active.",
+    "description": "Built-in sites hint"
+  },
+  "btnAddSite": {
+    "message": "Add Custom Site",
+    "description": "Add custom site button"
+  },
+  "thSiteHost": {
+    "message": "Match Domain (host / supports *.subdomain)",
+    "description": "Site table header: host"
+  },
+  "thInputSelector": {
+    "message": "Input Selector",
+    "description": "Site table header: input selector"
+  },
+  "thButtonSelector": {
+    "message": "Send Button Selector",
+    "description": "Site table header: button selector"
+  },
+  "placeholderHost": {
+    "message": "e.g. chat.example.com or *.example.com",
+    "description": "Site host input placeholder"
+  },
+  "placeholderInputSel": {
+    "message": "textarea, [contenteditable=\"true\"]",
+    "description": "Site input selector placeholder"
+  },
+  "placeholderButtonSel": {
+    "message": "button[data-testid=\"send-button\"]",
+    "description": "Site button selector placeholder"
+  },
+  "sitesTip": {
+    "message": "Tip: Input and send button selectors are CSS selectors. Press F12 in the target page to inspect elements (e.g. <code>textarea#prompt</code>, <code>button[data-testid=\"send-button\"]</code>). Leave empty for generic fallback.",
+    "description": "Sites tip text"
+  },
+  "sitesNote": {
+    "message": "Note: This extension detects sensitive content and can block sending (only on error-level matches). It's recommended to configure the send button selector to ensure blocking works.",
+    "description": "Sites note text"
+  },
+  "footerScanOnPaste": {
+    "message": "Scan on paste",
+    "description": "Footer: scan on paste checkbox"
+  },
+  "footerSyncHint": {
+    "message": "Rules and site configs sync in real time to all open tabs.",
+    "description": "Footer: sync hint"
+  },
+  "toastSaved": {
+    "message": "Saved and synced",
+    "description": "Toast: save success"
+  },
+  "confirmReset": {
+    "message": "Reset to default built-in rules? Your custom rules will be overwritten.",
+    "description": "Confirm reset dialog"
+  },
+  "importError": {
+    "message": "Import failed: {error}",
+    "description": "Import error message"
+  },
+  "importFormatError": {
+    "message": "Format error: missing rules array",
+    "description": "Import format error"
+  },
+  "warningBarTitle": {
+    "message": "AI Guard:",
+    "description": "Warning bar title prefix"
+  },
+  "warningBarSummary": {
+    "message": "{total} sensitive item(s) detected ({errors} blocked / {warns} warned)",
+    "description": "Warning bar summary"
+  },
+  "warningBlocked": {
+    "message": "Send blocked",
+    "description": "Warning bar: blocked"
+  },
+  "warningAllowed": {
+    "message": "Warning only, send not blocked",
+    "description": "Warning bar: allowed"
+  },
+  "toastBlocked": {
+    "message": "Send blocked — sensitive content detected (error level). Please remove and retry.",
+    "description": "Block toast message"
+  },
+  "descOpenAI": {
+    "message": "OpenAI API Key",
+    "description": "Rule description"
+  },
+  "descGitHub": {
+    "message": "GitHub Personal Token",
+    "description": "Rule description"
+  },
+  "descAWS": {
+    "message": "AWS Access Key",
+    "description": "Rule description"
+  },
+  "descGoogle": {
+    "message": "Google API Key",
+    "description": "Rule description"
+  },
+  "descPrivateKey": {
+    "message": "Private Key",
+    "description": "Rule description"
+  },
+  "descPassword": {
+    "message": "Plaintext Password",
+    "description": "Rule description"
+  },
+  "descInternalDomain": {
+    "message": "Internal Domain",
+    "description": "Rule description"
+  },
+  "descBusinessExample": {
+    "message": "Business keyword example",
+    "description": "Rule description example"
+  },
+  "langLabel": {
+    "message": "EN",
+    "description": "Language switch button label"
+  }
+}

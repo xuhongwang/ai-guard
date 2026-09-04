@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Guard</title>
+  <style>
+    body { width: 320px; margin: 0; font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; }
+    .head { padding: 14px 16px; background: linear-gradient(90deg, #ff4444, #ff8800); color: #fff; width: 100%; }
+    .head h1 { margin: 0; font-size: 16px; }
+    .head p { margin: 4px 0 0; font-size: 12px; opacity: .9; }
+    .body { padding: 14px 16px; }
+    .row { display: flex; align-items: center; justify-content: space-between; margin: 12px 0; font-size: 13px; }
+    .switch { position: relative; width: 42px; height: 24px; background: #ccc; border-radius: 12px; cursor: pointer; transition: .2s; }
+    .switch.on { background: #ff6600; }
+    .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: .2s; }
+    .switch.on::after { left: 20px; }
+    .switch.disabled { opacity: 0.4; pointer-events: none; }
+    .btn { display: block; width: 95%; padding: 10px; margin-top: 8px; border: none; border-radius: 18px; background: #f2f2f2; font-size: 13px; cursor: pointer; text-align: center; text-decoration: none; color: #333; }
+    .btn.primary { background: #ff6600; color: #fff; }
+    .stat { font-size: 12px; color: #888; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="head" style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <h1>🛡️ AI Guard</h1>
+      <p data-i18n="popupSubtitle">敏感内容检测与提醒</p>
+    </div>
+    <button id="langToggle" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.5);color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;" data-i18n="langLabel">中</button>
+  </div>
+  <div class="body">
+    <div class="row">
+      <span data-i18n="toggleEnabled">启用检测</span>
+      <div id="toggleEnabled" class="switch on"></div>
+    </div>
+    <div class="row">
+      <span data-i18n="toggleVisual">高亮 + 警告条</span>
+      <div id="toggleVisual" class="switch on"></div>
+    </div>
+    <div class="row">
+      <span data-i18n="toggleBlockSend">拦截发送</span>
+      <div id="toggleBlockSend" class="switch on"></div>
+    </div>
+    <a class="btn primary" href="#" id="openOptions">⚙️ <span data-i18n="openOptions">自定义规则（配置页）</span></a>
+    <div class="stat" id="ruleStat"></div>
+  </div>
+  <script src="defaults.js"></script>
+  <script src="lang.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

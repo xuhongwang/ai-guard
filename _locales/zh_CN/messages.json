@@ -1,0 +1,283 @@
+{
+  "extName": {
+    "message": "AI Guard — 敏感内容检测提醒",
+    "description": "Extension name"
+  },
+  "extDesc": {
+    "message": "在 AI 对话输入框中检测敏感关键字/正则并实时高亮提醒，可配置拦截发送。规则与站点可在配置页自定义。",
+    "description": "Extension description"
+  },
+
+  "popupSubtitle": {
+    "message": "敏感内容检测与提醒",
+    "description": "Popup header subtitle"
+  },
+  "toggleEnabled": {
+    "message": "启用检测",
+    "description": "Enable/disable toggle label"
+  },
+  "toggleVisual": {
+    "message": "高亮 + 警告条",
+    "description": "Visual warning toggle label"
+  },
+  "toggleBlockSend": {
+    "message": "拦截发送",
+    "description": "Block send toggle label"
+  },
+  "openOptions": {
+    "message": "自定义规则（配置页）",
+    "description": "Open options page button"
+  },
+  "ruleStat": {
+    "message": "已启用规则：{count} 条",
+    "description": "Rule count stat, {count} is placeholder"
+  },
+
+  "optionsTitle": {
+    "message": "AI Guard · 规则配置",
+    "description": "Options page title"
+  },
+  "optionsDesc": {
+    "message": "配置敏感内容检测规则。命中 <b>error</b> 级别将拦截发送，<b>warn</b> 级别仅警告。",
+    "description": "Options page description"
+  },
+  "btnAddRule": {
+    "message": "新增规则",
+    "description": "Add rule button"
+  },
+  "btnReset": {
+    "message": "恢复默认",
+    "description": "Reset button"
+  },
+  "btnExport": {
+    "message": "导出",
+    "description": "Export button"
+  },
+  "btnImport": {
+    "message": "导入",
+    "description": "Import button"
+  },
+  "thEnabled": {
+    "message": "启用",
+    "description": "Table header: enabled"
+  },
+  "thType": {
+    "message": "类型",
+    "description": "Table header: rule type"
+  },
+  "thPattern": {
+    "message": "匹配内容（关键字或正则）",
+    "description": "Table header: match pattern"
+  },
+  "thDesc": {
+    "message": "说明",
+    "description": "Table header: description"
+  },
+  "thSeverity": {
+    "message": "级别",
+    "description": "Table header: severity"
+  },
+  "thAction": {
+    "message": "操作",
+    "description": "Table header: action"
+  },
+  "typeKeyword": {
+    "message": "关键字",
+    "description": "Rule type: keyword"
+  },
+  "typeRegex": {
+    "message": "正则",
+    "description": "Rule type: regex"
+  },
+  "severityError": {
+    "message": "拦截",
+    "description": "Severity: error/block"
+  },
+  "severityWarn": {
+    "message": "警告",
+    "description": "Severity: warn"
+  },
+  "btnDelete": {
+    "message": "删除",
+    "description": "Delete button"
+  },
+  "placeholderPattern": {
+    "message": "关键字或正则，如 sk-[A-Za-z0-9_-]{20,}",
+    "description": "Rule pattern input placeholder"
+  },
+  "placeholderDesc": {
+    "message": "描述",
+    "description": "Rule description input placeholder"
+  },
+
+  "testTitle": {
+    "message": "测试规则",
+    "description": "Test panel title"
+  },
+  "testDesc": {
+    "message": "（输入样例文本，实时查看命中效果）",
+    "description": "Test panel description"
+  },
+  "testPlaceholder": {
+    "message": "在此粘贴或输入测试文本…例如：\n连接数据库用密码 password=MyS3cret!\n调用 OpenAI 用 sk-1234567890abcdefghij",
+    "description": "Test textarea placeholder"
+  },
+  "btnFillDemo": {
+    "message": "载入示例",
+    "description": "Load demo text button"
+  },
+  "btnClearTest": {
+    "message": "清空",
+    "description": "Clear test button"
+  },
+  "testHint": {
+    "message": "在上方输入文本后，命中的规则和高亮片段会实时显示。",
+    "description": "Test panel hint"
+  },
+  "testNoHits": {
+    "message": "未命中任何规则。",
+    "description": "Test result: no hits"
+  },
+  "testSummary": {
+    "message": "{errors} 拦截、{warns} 警告 — 共 {total} 处命中：",
+    "description": "Test result summary"
+  },
+
+  "sitesTitle": {
+    "message": "站点配置",
+    "description": "Site config section title"
+  },
+  "sitesDesc": {
+    "message": "（内置站点适配器可覆盖大多数 AI 站点，你也可以添加自定义站点）",
+    "description": "Site config section description"
+  },
+  "builtinToggle": {
+    "message": "启用内置站点（ChatGPT / Claude / Copilot / Gemini / 豆包 / 元宝 / Kimi）",
+    "description": "Built-in sites toggle label"
+  },
+  "builtinHint": {
+    "message": "关闭后仅下方自定义站点生效。",
+    "description": "Built-in sites hint"
+  },
+  "btnAddSite": {
+    "message": "添加自定义站点",
+    "description": "Add custom site button"
+  },
+  "thSiteHost": {
+    "message": "匹配域名（host / 支持 *.子域）",
+    "description": "Site table header: host"
+  },
+  "thInputSelector": {
+    "message": "输入框选择器",
+    "description": "Site table header: input selector"
+  },
+  "thButtonSelector": {
+    "message": "发送按钮选择器",
+    "description": "Site table header: button selector"
+  },
+  "placeholderHost": {
+    "message": "如 chat.example.com 或 *.example.com",
+    "description": "Site host input placeholder"
+  },
+  "placeholderInputSel": {
+    "message": "textarea, [contenteditable=\"true\"]",
+    "description": "Site input selector placeholder"
+  },
+  "placeholderButtonSel": {
+    "message": "button[data-testid=\"send-button\"]",
+    "description": "Site button selector placeholder"
+  },
+  "sitesTip": {
+    "message": "提示：输入框和发送按钮选择器均为 CSS 选择器。可按 F12 在目标网页审查元素获取（如 <code>textarea#prompt</code>、<code>button[data-testid=\"send-button\"]</code>）。留空则走通用兜底。",
+    "description": "Sites tip text"
+  },
+  "sitesNote": {
+    "message": "注：本插件可检测敏感内容并拦截发送（仅 error 级别命中时）。建议配置发送按钮选择器以确保拦截生效。",
+    "description": "Sites note text"
+  },
+
+  "footerScanOnPaste": {
+    "message": "粘贴时扫描",
+    "description": "Footer: scan on paste checkbox"
+  },
+  "footerSyncHint": {
+    "message": "规则与站点配置实时同步到所有已打开的标签页。",
+    "description": "Footer: sync hint"
+  },
+
+  "toastSaved": {
+    "message": "已保存并同步",
+    "description": "Toast: save success"
+  },
+  "confirmReset": {
+    "message": "恢复默认内置规则？当前自定义规则将被覆盖。",
+    "description": "Confirm reset dialog"
+  },
+  "importError": {
+    "message": "导入失败：{error}",
+    "description": "Import error message"
+  },
+  "importFormatError": {
+    "message": "格式错误：缺少 rules 数组",
+    "description": "Import format error"
+  },
+
+  "warningBarTitle": {
+    "message": "AI Guard：",
+    "description": "Warning bar title prefix"
+  },
+  "warningBarSummary": {
+    "message": "检测到 {total} 项敏感内容（{errors} 拦截 / {warns} 警告）",
+    "description": "Warning bar summary"
+  },
+  "warningBlocked": {
+    "message": "已拦截发送",
+    "description": "Warning bar: blocked"
+  },
+  "warningAllowed": {
+    "message": "仅提醒，不会拦截发送",
+    "description": "Warning bar: allowed"
+  },
+  "toastBlocked": {
+    "message": "发送已拦截 — 检测到敏感内容（error 级别），请清除后重试",
+    "description": "Block toast message"
+  },
+
+  "descOpenAI": {
+    "message": "OpenAI API Key",
+    "description": "Rule description"
+  },
+  "descGitHub": {
+    "message": "GitHub Personal Token",
+    "description": "Rule description"
+  },
+  "descAWS": {
+    "message": "AWS Access Key",
+    "description": "Rule description"
+  },
+  "descGoogle": {
+    "message": "Google API Key",
+    "description": "Rule description"
+  },
+  "descPrivateKey": {
+    "message": "私钥",
+    "description": "Rule description"
+  },
+  "descPassword": {
+    "message": "明文密码",
+    "description": "Rule description"
+  },
+  "descInternalDomain": {
+    "message": "内网域名",
+    "description": "Rule description"
+  },
+  "descBusinessExample": {
+    "message": "业务关键字示例",
+    "description": "Rule description example"
+  },
+
+  "langLabel": {
+    "message": "中",
+    "description": "Language switch button label"
+  }
+}

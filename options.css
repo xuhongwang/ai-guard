@@ -1,0 +1,71 @@
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  margin: 0; padding: 20px 28px 60px; color: #1f2937; max-width: 1100px; margin: 0 auto;
+  background: #f8fafc;
+}
+header { margin-bottom: 16px; }
+h1 { font-size: 20px; margin: 0 0 4px; }
+header p { margin: 0; color: #64748b; font-size: 13px; }
+
+.toolbar { margin: 14px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+button {
+  border: 1px solid #cbd5e1; background: #fff; border-radius: 6px;
+  padding: 6px 12px; font-size: 13px; cursor: pointer; color: #334155;
+}
+button:hover { background: #f1f5f9; }
+button.primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+button.primary:hover { background: #1d4ed8; }
+button.del { color: #dc2626; border-color: #fecaca; }
+button.del:hover { background: #fef2f2; }
+
+table.rules { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
+th { background: #f8fafc; color: #475569; font-weight: 600; }
+td input[type="text"], td select { width: 100%; padding: 5px 7px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 13px; }
+td select { padding: 5px; }
+
+footer { margin-top: 20px; font-size: 13px; display: flex; gap: 16px; align-items: center; }
+.muted { color: #94a3b8; font-size: 12px; }
+.small { font-size: 12px; line-height: 1.6; }
+
+/* ============ Toast 保存提示 ============ */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2147483647;
+  background: #16a34a; color: #fff; padding: 10px 20px;
+  border-radius: 8px; font-size: 13px; font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  animation: toast-in .25s ease, toast-out .3s ease 1.7s forwards;
+}
+@keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes toast-out { from { opacity: 1; } to { opacity: 0; } }
+code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+/* ============ 测试规则面板 ============ */
+.panel {
+  margin-top: 26px; padding: 16px 18px; background: #fff;
+  border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.panel h2 { font-size: 15px; margin: 0 0 12px; }
+#testInput {
+  width: 100%; min-height: 110px; padding: 10px 12px; border: 1px solid #cbd5e1;
+  border-radius: 8px; font-size: 13px; line-height: 1.6; resize: vertical; font-family: inherit;
+}
+#testInput:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+.test-actions { margin: 8px 0; display: flex; gap: 8px; }
+.test-result {
+  min-height: 44px; padding: 10px 12px; border-radius: 8px; background: #f8fafc;
+  font-size: 13px; line-height: 1.7; white-space: pre-wrap; word-break: break-all;
+}
+.test-result .hit-mark {
+  background: #fee2e2; color: #b91c1c; padding: 0 2px; border-radius: 3px;
+  font-weight: 600; box-shadow: inset 0 -1px 0 #f87171;
+}
+.test-result .summary { font-weight: 600; margin-bottom: 6px; display: block; }
+.test-result .tag-error { color: #dc2626; }
+.test-result .tag-warn { color: #d97706; }
+
+/* ============ 站点配置 ============ */
+.site-options { margin: 6px 0 12px; font-size: 13px; }
+.site-options label { cursor: pointer; }
+#siteTable td input[type="text"] { font-family: monospace; }

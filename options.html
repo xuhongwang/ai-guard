@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title data-i18n="optionsTitle">AI Guard · 规则配置</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <header style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <h1>🛡️ <span data-i18n="optionsTitle">AI Guard · 规则配置</span></h1>
+      <p data-i18n-html="optionsDesc">配置敏感内容检测规则。命中 <b>error</b> 级别将拦截发送，<b>warn</b> 级别仅警告。</p>
+    </div>
+    <button id="langToggle" style="background:#f0f0f0;border:1px solid #ddd;padding:6px 14px;border-radius:16px;font-size:13px;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-top:4px;" data-i18n="langLabel">中</button>
+  </header>
+
+  <!-- ============ 规则列表 ============ -->
+  <section class="toolbar">
+    <button id="btnAdd" class="primary"><span data-i18n="btnAddRule">新增规则</span></button>
+    <button id="btnReset"><span data-i18n="btnReset">恢复默认</span></button>
+    <button id="btnExport"><span data-i18n="btnExport">导出</span></button>
+    <button id="btnImport"><span data-i18n="btnImport">导入</span></button>
+    <input type="file" id="fileInput" accept=".json" hidden />
+  </section>
+
+  <table class="rules">
+    <thead>
+      <tr>
+        <th style="width:44px" data-i18n="thEnabled">启用</th>
+        <th style="width:90px" data-i18n="thType">类型</th>
+        <th data-i18n="thPattern">匹配内容（关键字或正则）</th>
+        <th style="width:140px" data-i18n="thDesc">说明</th>
+        <th style="width:110px" data-i18n="thSeverity">级别</th>
+        <th style="width:70px" data-i18n="thAction">操作</th>
+      </tr>
+    </thead>
+    <tbody id="ruleList"></tbody>
+  </table>
+
+  <!-- ============ 测试规则面板 ============ -->
+  <section class="panel">
+    <h2>🧪 <span data-i18n="testTitle">测试规则</span> <span class="muted" data-i18n="testDesc">（输入样例文本，实时看命中效果）</span></h2>
+    <textarea id="testInput" data-i18n-placeholder="testPlaceholder" placeholder="在此粘贴或输入测试文本…例如：&#10;连接数据库用密码 password=MyS3cret!&#10;调用 OpenAI 用 sk-1234567890abcdefghij"></textarea>
+    <div class="test-actions">
+      <button id="btnFillDemo"><span data-i18n="btnFillDemo">载入示例</span></button>
+      <button id="btnClearTest"><span data-i18n="btnClearTest">清空</span></button>
+    </div>
+    <div id="testResult" class="test-result">
+      <span class="muted" data-i18n="testHint">在上方输入文本后，命中的规则和高亮片段会实时显示。</span>
+    </div>
+  </section>
+
+  <!-- ============ 站点配置 ============ -->
+  <section class="panel">
+    <h2>🌐 <span data-i18n="sitesTitle">站点配置</span> <span class="muted" data-i18n="sitesDesc">（内置通用匹配站点可以匹配大多数网站，同时可以添加任意网站）</span></h2>
+    <div class="site-options">
+      <label>
+        <input type="checkbox" id="builtinToggle" />
+        <span data-i18n="builtinToggle">启用内置站点（ChatGPT / Claude / Copilot / Gemini / 豆包 / 元宝 / Kimi）</span>
+      </label>
+      <span class="muted" data-i18n="builtinHint">关闭后仅在下方"自定义站点"生效。</span>
+    </div>
+
+    <div class="toolbar">
+      <button id="btnAddSite" class="primary"><span data-i18n="btnAddSite">添加自定义站点</span></button>
+      <span class="hint" id="siteStatus"></span>
+    </div>
+
+    <table class="rules" id="siteTable">
+      <thead>
+        <tr>
+          <th style="width:44px" data-i18n="thEnabled">启用</th>
+          <th data-i18n="thSiteHost">匹配域名（host / 支持 *.子域）</th>
+          <th data-i18n="thInputSelector">输入框选择器</th>
+          <th data-i18n="thButtonSelector">发送按钮选择器</th>
+          <th style="width:70px" data-i18n="thAction">操作</th>
+        </tr>
+      </thead>
+      <tbody id="siteList"></tbody>
+    </table>
+    <p class="muted small" data-i18n-html="sitesTip">
+      提示：输入框和发送按钮选择器均为 CSS 选择器。可按 F12 在目标网页审查元素获取（如 <code>textarea#prompt</code>、<code>button[data-testid="send-button"]</code>）。留空则走通用兜底。<br>
+      注：本插件可检测敏感内容并<span style="color:#ff4444;font-weight:600">拦截发送</span>（仅 error 级别命中时），建议配置发送按钮选择器以确保拦截生效。
+    </p>
+  </section>
+
+  <footer>
+    <label><input type="checkbox" id="scanOnPaste" /> <span data-i18n="footerScanOnPaste">监听粘贴</span></label>
+    <span class="muted" data-i18n="footerSyncHint">规则与站点配置实时同步到所有已打开的标签页。</span>
+  </footer>
+
+  <script src="defaults.js"></script>
+  <script src="lang.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
