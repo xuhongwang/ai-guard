@@ -41,7 +41,7 @@ function showToast(msg) {
 // =================== 规则列表渲染 ===================
 function render(state) {
   const tbody = document.getElementById('ruleList');
-  tbody.innerHTML = '';
+  tbody.replaceChildren();
   state.rules.forEach((rule, idx) => {
     const tr = document.createElement('tr');
 
@@ -109,7 +109,7 @@ function renderSites(state) {
   if (builtin) builtin.checked = !!state.sites.builtin;
 
   const tbody = document.getElementById('siteList');
-  tbody.innerHTML = '';
+  tbody.replaceChildren();
   state.sites.custom.forEach((site, idx) => {
     const tr = document.createElement('tr');
 
@@ -144,10 +144,6 @@ function renderSites(state) {
 }
 
 // =================== 测试规则面板 ===================
-function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
 let lastState = null;
 function renderTest() {
   if (!lastState) return;
@@ -156,7 +152,11 @@ function renderTest() {
   if (!el || !out) return;
   const text = el.value;
   if (!text) {
-    out.innerHTML = `<span class="muted">${L.t('testHint')}</span>`;
+    out.replaceChildren();
+    const hint = document.createElement('span');
+    hint.className = 'muted';
+    hint.textContent = L.t('testHint');
+    out.appendChild(hint);
     return;
   }
 
@@ -165,29 +165,50 @@ function renderTest() {
     .map((h) => ({ start: h.index, end: h.index + h.match.length, hit: h }))
     .sort((a, b) => a.start - b.start);
 
-  let html = '';
+  const fragment = document.createDocumentFragment();
   let cursor = 0;
   let errors = 0, warns = 0;
-  ranges.forEach((r) => {
-    if (r.start > cursor) html += escapeHtml(text.slice(cursor, r.start));
-    html += `<span class="hit-mark" title="${escapeHtml(r.hit.rule.desc || r.hit.rule.pattern)}">${escapeHtml(text.slice(r.start, r.end))}</span>`;
-    cursor = Math.max(cursor, r.end);
-    if (r.hit.rule.severity === 'error') errors++; else warns++;
-  });
-  if (cursor < text.length) html += escapeHtml(text.slice(cursor));
 
   if (hits.length === 0) {
-    out.innerHTML = `<span class="muted">✅ ${L.t('testNoHits')}</span>`;
-    return;
+    const noHits = document.createElement('span');
+    noHits.className = 'muted';
+    noHits.textContent = `✅ ${L.t('testNoHits')}`;
+    fragment.appendChild(noHits);
+  } else {
+    const summary = document.createElement('span');
+    summary.className = 'summary tag-error';
+    summary.textContent = L.t('testSummary', { errors, warns: hits.length, total: hits.length });
+    fragment.appendChild(summary);
+
+    ranges.forEach((r) => {
+      if (r.start > cursor) {
+        fragment.appendChild(document.createTextNode(text.slice(cursor, r.start)));
+      }
+      const mark = document.createElement('span');
+      mark.className = 'hit-mark';
+      mark.title = r.hit.rule.desc || r.hit.rule.pattern;
+      mark.textContent = text.slice(r.start, r.end);
+      fragment.appendChild(mark);
+      cursor = Math.max(cursor, r.end);
+      if (r.hit.rule.severity === 'error') errors++; else warns++;
+    });
+    if (cursor < text.length) {
+      fragment.appendChild(document.createTextNode(text.slice(cursor)));
+    }
+
+    summary.textContent = L.t('testSummary', { errors, warns, total: hits.length });
+
+    hits.forEach((h) => {
+      fragment.appendChild(document.createTextNode('\n'));
+      const span = document.createElement('span');
+      span.className = h.rule.severity === 'error' ? 'tag-error' : 'tag-warn';
+      span.textContent = `• [${h.rule.severity}] ${h.rule.desc || h.rule.pattern} → "${h.match}"`;
+      fragment.appendChild(span);
+    });
   }
 
-  const details = hits
-    .map((h) => `<span class="${h.rule.severity === 'error' ? 'tag-error' : 'tag-warn'}">• [${h.rule.severity}] ${escapeHtml(h.rule.desc || h.rule.pattern)} → "${escapeHtml(h.match)}"</span>`)
-    .join('\n');
-  out.innerHTML =
-    `<span class="summary tag-error">${L.t('testSummary', { errors, warns, total: hits.length })}</span>` +
-    html +
-    '\n\n' + details;
+  out.replaceChildren();
+  out.appendChild(fragment);
 }
 
 // =================== 交互绑定 ===================

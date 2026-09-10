@@ -47,30 +47,94 @@ const DEFAULT_SETTINGS = {
 };
 
 /**
+ * 文本归一化：去除零宽字符、全角转半角，用于抗变形匹配。
+ * 仅用于扫描比对，不改变用户实际输入。
+ */
+function normalizeText(text) {
+  return text
+    .replace(/[\u200B-\u200F\uFEFF\u2060\u00AD]/g, '')
+    .replace(/[\uFF01-\uFF5E]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0))
+    .replace(/\u3000/g, ' ');
+}
+
+/**
  * 纯函数：对一段文本跑规则，返回命中列表。
- * 逻辑与 content-script.js 的 Scanner 保持一致，供"测试规则"面板复用。
+ * 内部先归一化文本再匹配（抗变形），返回的 match 和 index 对应原始文本。
  */
 function scanText(text, rules) {
   const hits = [];
   if (!text || !Array.isArray(rules)) return hits;
+
+  const normalized = normalizeText(text);
+  if (normalized === text) {
+    for (const rule of rules) {
+      if (!rule || !rule.enabled) continue;
+      try {
+        if (rule.type === 'regex') {
+          const re = new RegExp(rule.pattern, 'g');
+          let m;
+          while ((m = re.exec(text)) !== null) {
+            hits.push({ rule, match: m[0], index: m.index });
+            if (m.index === re.lastIndex) re.lastIndex++;
+          }
+        } else {
+          const needle = String(rule.pattern);
+          if (!needle) continue;
+          const lower = text.toLowerCase();
+          let from = 0, pos;
+          while ((pos = lower.indexOf(needle.toLowerCase(), from)) !== -1) {
+            hits.push({ rule, match: text.slice(pos, pos + needle.length), index: pos });
+            from = pos + Math.max(needle.length, 1);
+          }
+        }
+      } catch (e) { /* 非法规则跳过 */ }
+    }
+    return hits;
+  }
+
+  const normToOrig = [];
+  const origToNorm = [];
+  let ni = 0;
+  for (let oi = 0; oi < text.length; oi++) {
+    const nc = normalizeText(text[oi]);
+    if (nc.length > 0) {
+      normToOrig[ni] = oi;
+      origToNorm[oi] = ni;
+      ni++;
+    } else {
+      origToNorm[oi] = -1;
+    }
+  }
+
   for (const rule of rules) {
     if (!rule || !rule.enabled) continue;
     try {
       if (rule.type === 'regex') {
         const re = new RegExp(rule.pattern, 'g');
         let m;
-        while ((m = re.exec(text)) !== null) {
-          hits.push({ rule, match: m[0], index: m.index });
-          if (m.index === re.lastIndex) re.lastIndex++; // 防止零宽死循环
+        while ((m = re.exec(normalized)) !== null) {
+          const nStart = m.index;
+          const nEnd = nStart + m[0].length;
+          const origStart = normToOrig[nStart] || 0;
+          let origEnd = origStart;
+          while (origEnd < text.length && origToNorm[origEnd] === -1) origEnd++;
+          if (origEnd < text.length) origEnd = (normToOrig[nEnd - 1] || 0) + 1;
+          hits.push({ rule, match: text.slice(origStart, origEnd), index: origStart });
+          if (m.index === re.lastIndex) re.lastIndex++;
         }
       } else {
         const needle = String(rule.pattern);
         if (!needle) continue;
-        const lower = text.toLowerCase();
+        const nLower = normalized.toLowerCase();
+        const nNeedle = needle.toLowerCase();
         let from = 0, pos;
-        while ((pos = lower.indexOf(needle.toLowerCase(), from)) !== -1) {
-          hits.push({ rule, match: text.slice(pos, pos + needle.length), index: pos });
-          from = pos + Math.max(needle.length, 1);
+        while ((pos = nLower.indexOf(nNeedle, from)) !== -1) {
+          const origStart = normToOrig[pos] || 0;
+          let origEnd = origStart;
+          while (origEnd < text.length && origToNorm[origEnd] === -1) origEnd++;
+          if (origEnd < text.length) origEnd = (normToOrig[pos + nNeedle.length - 1] || 0) + 1;
+          hits.push({ rule, match: text.slice(origStart, origEnd), index: origStart });
+          from = pos + Math.max(nNeedle.length, 1);
         }
       }
     } catch (e) { /* 非法规则跳过 */ }
@@ -204,4 +268,4 @@ const I18N_MESSAGES = {
 
 // 挂载到 window：当本文件作为 content script 注入时，供 content-script.js 复用同一份 DEFAULT_RULES，
 // 避免"测试面板"与"真实拦截"规则分叉。options.html 直引时也兼容（window 已存在即可）。
-try { window.__AI_GUARD_DEFAULTS__ = { DEFAULT_RULES, DEFAULT_SITES, DEFAULT_SETTINGS, scanText, I18N_MESSAGES }; } catch (e) {}
+try { window.__AI_GUARD_DEFAULTS__ = { DEFAULT_RULES, DEFAULT_SITES, DEFAULT_SETTINGS, normalizeText, scanText, I18N_MESSAGES }; } catch (e) {}

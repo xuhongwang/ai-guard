@@ -38,7 +38,7 @@
     "description": "Options page title"
   },
   "optionsDesc": {
-    "message": "配置敏感内容检测规则。命中 <b>error</b> 级别将拦截发送，<b>warn</b> 级别仅警告。",
+    "message": "配置敏感内容检测规则。命中 error 级别将拦截发送，warn 级别仅警告。",
     "description": "Options page description"
   },
   "btnAddRule": {
@@ -188,7 +188,7 @@
     "description": "Site button selector placeholder"
   },
   "sitesTip": {
-    "message": "提示：输入框和发送按钮选择器均为 CSS 选择器。可按 F12 在目标网页审查元素获取（如 <code>textarea#prompt</code>、<code>button[data-testid=\"send-button\"]</code>）。留空则走通用兜底。",
+    "message": "提示：输入框和发送按钮选择器均为 CSS 选择器。可按 F12 在目标网页审查元素获取（如 textarea#prompt、button[data-testid=\"send-button\"]）。留空则走通用兜底。",
     "description": "Sites tip text"
   },
   "sitesNote": {

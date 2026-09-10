@@ -180,7 +180,7 @@ const L = (() => {
       root.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
         if (key && key in _messages) {
-          el.innerHTML = _messages[key];
+          el.textContent = _messages[key];
         }
       });
       root.querySelectorAll('[data-i18n-placeholder]').forEach(el => {

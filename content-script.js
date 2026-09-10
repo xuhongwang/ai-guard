@@ -9,16 +9,17 @@
     setRules(rules) { this.rules = rules || []; }
     scan(text) {
       if (!text) return [];
+      const normalized = _norm(text);
       const hits = [];
       for (const rule of this.rules) {
         if (!rule || !rule.enabled) continue;
         try {
           if (rule.type === 'regex') {
             const re = new RegExp(rule.pattern, 'g');
-            if (re.test(text)) hits.push(rule);
+            if (re.test(normalized)) hits.push(rule);
             re.lastIndex = 0;
           } else {
-            const haystack = text.toLowerCase();
+            const haystack = normalized.toLowerCase();
             const needle = String(rule.pattern).toLowerCase();
             if (needle && haystack.includes(needle)) hits.push(rule);
           }
@@ -165,6 +166,10 @@
   ];
   const DEFAULT_RULES = (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.DEFAULT_RULES) || FALLBACK_RULES;
 
+  const _norm = (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.normalizeText) || function (t) {
+    return t.replace(/[\u200B-\u200F\uFEFF\u2060\u00AD]/g, '').replace(/[\uFF01-\uFF5E]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/\u3000/g, ' ');
+  };
+
   let settings = { enabled: true, visualWarning: true, blockSend: true, scanOnPaste: true, rules: DEFAULT_RULES, sites: { builtin: true, custom: [] } };
   const scanner = new Scanner(settings.rules);
   let adapter = buildAdapter(settings.sites);
@@ -256,9 +261,16 @@
     const summary = L.t('warningBarSummary', { total: hits.length, errors, warns });
     const blockedText = blocked ? L.t('warningBlocked') : L.t('warningAllowed');
     const descList = hits.map((h) => h.desc || h.pattern).filter(Boolean).join(', ');
-    bar.innerHTML =
-      `<b>🚨 ${L.t('warningBarTitle')}</b> ${summary}<br>` +
-      `<span style="font-size:12px;opacity:.9">${descList}（${blockedText}）</span>`;
+    bar.replaceChildren();
+    const b = document.createElement('b');
+    b.textContent = `🚨 ${L.t('warningBarTitle')}`;
+    bar.appendChild(b);
+    bar.appendChild(document.createTextNode(` ${summary}`));
+    bar.appendChild(document.createElement('br'));
+    const detail = document.createElement('span');
+    detail.style.cssText = 'font-size:12px;opacity:.9';
+    detail.textContent = `${descList}（${blockedText}）`;
+    bar.appendChild(detail);
   }
 
   function recheck() {

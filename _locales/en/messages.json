@@ -184,7 +184,7 @@
     "description": "Site button selector placeholder"
   },
   "sitesTip": {
-    "message": "Tip: Input and send button selectors are CSS selectors. Press F12 in the target page to inspect elements (e.g. <code>textarea#prompt</code>, <code>button[data-testid=\"send-button\"]</code>). Leave empty for generic fallback.",
+    "message": "Tip: Input and send button selectors are CSS selectors. Press F12 in the target page to inspect elements (e.g. textarea#prompt, button[data-testid=\"send-button\"]). Leave empty for generic fallback.",
     "description": "Sites tip text"
   },
   "sitesNote": {
