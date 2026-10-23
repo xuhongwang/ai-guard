@@ -4,7 +4,10 @@ const defaultSettings = {
   blockSend: true,
   scanOnPaste: true,
   rules: (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.DEFAULT_RULES) || [],
-  sites: (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.DEFAULT_SITES) || { builtin: true, custom: [] },
+  sites: (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.DEFAULT_SITES) || {
+    builtin: true,
+    custom: [],
+  },
 };
 
 function loadSettings(cb) {

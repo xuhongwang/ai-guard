@@ -13,10 +13,7 @@
       }
     }
   },
-  "permissions": [
-    "storage",
-    "tabs"
-  ],
+  "permissions": ["storage", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -32,9 +29,7 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
+      "matches": ["<all_urls>"],
       "js": ["defaults.js", "lang.js", "content-script.js"],
       "css": ["content-style.css"],
       "run_at": "document_idle"

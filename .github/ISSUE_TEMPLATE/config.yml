@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞（私密）
+    url: https://github.com/xuhongwang/ai-guard/security/advisories/new
+    about: 请勿公开提交安全漏洞，使用 GitHub 私密报告
+  - name: 开发与调试文档
+    url: https://github.com/xuhongwang/ai-guard/blob/main/docs/DEVELOPMENT.md
+    about: 本地加载、调试与常见问题
