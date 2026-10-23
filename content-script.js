@@ -235,6 +235,24 @@
     return el.value || el.textContent || '';
   }
 
+  // 元素是否可见（排除被隐藏的旧编辑器，避免跳转后仍扫描到旧内容）
+  function isVisible(el) {
+    if (!el || !el.isConnected) return false;
+    if (typeof el.getClientRects === 'function' && el.getClientRects().length > 0) return true;
+    return false;
+  }
+
+  // 在当前页面中查找第一个可见的输入框（适配器命中隐藏元素时兜底）
+  function findVisibleInput() {
+    const list = document.querySelectorAll(
+      'textarea, [contenteditable="true"], [data-slate-editor="true"], input[type="text"]'
+    );
+    for (const el of list) {
+      if (isVisible(el)) return el;
+    }
+    return null;
+  }
+
   function clearWarning() {
     document.querySelectorAll('.__ai-guard-danger').forEach((el) => el.classList.remove('__ai-guard-danger'));
     const bar = document.getElementById('__ai-guard-bar');
@@ -246,12 +264,18 @@
     el.classList.add('__ai-guard-danger');
   }
 
+  // 悬停警告条时在顶部 / 底部之间切换
+  function toggleBarPosition(bar) {
+    bar.classList.toggle('__ai-guard-bottom');
+  }
+
   function showWarningBar(hits) {
     if (!isContextValid()) return;
     let bar = document.getElementById('__ai-guard-bar');
     if (!bar) {
       bar = document.createElement('div');
       bar.id = '__ai-guard-bar';
+      bar.addEventListener('mouseenter', () => toggleBarPosition(bar));
       document.body.prepend(bar);
     }
     const errors = hits.filter((h) => h.severity === 'error').length;
@@ -276,11 +300,18 @@
   function recheck() {
     if (!isContextValid()) return;
     if (!settings.enabled) {
+      currentHits = [];
       clearWarning();
       return;
     }
-    const el = adapter.input();
-    if (!el) return;
+    const found = adapter.input();
+    const el = found && isVisible(found) ? found : findVisibleInput();
+    if (!el) {
+      // 当前页面没有可用的输入框（页面跳转 / 编辑器卸载）时清理残留警告
+      currentHits = [];
+      clearWarning();
+      return;
+    }
     const text = getText(el);
     currentHits = scanner.scan(text);
     if (currentHits.length > 0) {
@@ -405,12 +436,25 @@
     setTimeout(() => toast.remove(), 2500);
   }
 
-  // 兜底轮询（应对动态挂载输入框），需等 i18n + 设置加载后再启动
+  // ---- 路由 / 页面跳转：清理残留警告并重新检测 ----
+  let _lastUrl = location.href;
+  function onNavigate() {
+    if (location.href === _lastUrl) return false;
+    _lastUrl = location.href;
+    currentHits = [];
+    clearWarning();
+    // 等待新页面 DOM 渲染后再检测，避免扫到跳转前的旧编辑器
+    setTimeout(recheck, 200);
+    return true;
+  }
+  window.addEventListener('popstate', onNavigate);
+  window.addEventListener('hashchange', onNavigate);
+
   L.init().then(() => {
     loadSettings(() => {
       recheck();
       setTimeout(recheck, 500);
-      _pollId = setInterval(recheck, 1500);
+      _pollId = setInterval(() => { if (!onNavigate()) recheck(); }, 1500);
     });
   });
 })();

@@ -21,6 +21,14 @@
   text-align: center;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
   font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+#__ai-guard-bar.__ai-guard-bottom {
+  top: auto;
+  bottom: 0;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.35);
 }
 
 @keyframes __ai-guard-fadeout {
