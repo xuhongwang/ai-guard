@@ -6,10 +6,24 @@
 - npm 10+
 - Chrome 或 Firefox（Manifest V3）
 
-## 安装依赖
+## 安装与构建
 
 ```bash
 npm ci
+npm run build
+```
+
+构建采用 copy-only 方式，不引入打包器：
+
+```text
+src/core/defaults.js              → dist/<target>/defaults.js
+src/background/background.js      → dist/<target>/background.js
+src/content/content-script.js     → dist/<target>/content-script.js
+src/content/content-style.css     → dist/<target>/content-style.css
+src/ui/*                          → dist/<target>/*
+src/generated/lang.js             → dist/<target>/lang.js
+_locales/、icons/、privacy.html、LICENSE → dist/<target>/
+manifests/{base,<target>}.json    → dist/<target>/manifest.json
 ```
 
 在受限或离线环境中，建议把 npm 缓存与用户配置放到工作区，避免写入用户目录：
@@ -22,43 +36,38 @@ npm ci
 
 ## 常用命令
 
-| 命令                   | 说明                                       |
-| ---------------------- | ------------------------------------------ |
-| `npm run lint`         | ESLint 检查                                |
-| `npm run lint:fix`     | ESLint 自动修复                            |
-| `npm run format`       | Prettier 格式化全部文件                    |
-| `npm run format:check` | 仅校验格式                                 |
-| `npm test`             | Node 内置测试运行器执行 `tests/unit`       |
-| `npm run verify`       | lint + format:check + test，提交前必须通过 |
+| 命令                    | 说明                                       |
+| ----------------------- | ------------------------------------------ |
+| `npm run lint`          | ESLint 检查                                |
+| `npm run lint:fix`      | ESLint 自动修复                            |
+| `npm run format`        | Prettier 格式化全部文件                    |
+| `npm run format:check`  | 仅校验格式                                 |
+| `npm test`              | Node 内置测试运行器执行 `tests/unit`       |
+| `npm run gen:i18n`      | 由 `_locales` 生成 `src/generated/lang.js` |
+| `npm run gen:manifests` | 生成清单到 `dist/<target>`                 |
+| `npm run build`         | 构建 `dist/chrome` 与 `dist/firefox`       |
+| `npm run verify`        | lint + format:check + test + build         |
 
-> 当前没有 `build` 脚本，扩展直接加载仓库源码。迁移 PR 会新增 copy-only 构建，输出到 `dist/`，仍不引入打包器。
+> `src/generated/lang.js` 与 `dist/` 均为生成物，不要手改或提交。文案只改 `_locales/`，清单只改 `manifests/`。
 
 ## 在 Chrome 中加载
 
-1. 打开 `chrome://extensions/`
-2. 开启「开发者模式」
-3. 点击「加载已解压的扩展程序」，选择仓库根目录
+1. 运行 `npm run build`
+2. 打开 `chrome://extensions/`，开启「开发者模式」
+3. 点击「加载已解压的扩展程序」，选择 `dist/chrome`
 4. 修改源码后：
-   - 后台：在扩展卡片上点击刷新
-   - 内容脚本：刷新目标网页
-   - 配置页 / 弹窗：直接关闭再打开
+   - 重新运行 `npm run build`
+   - 在扩展卡片上点击刷新
+   - 刷新目标网页（内容脚本只在页面加载时注入）
+   - 配置页 / 弹窗关闭后重新打开
 
 ## 在 Firefox 中加载
 
-1. 打开 `about:debugging#/runtime/this-firefox`
-2. 点击「临时载入附加组件」
-3. 选择 `manifest.firefox.json`
+1. 运行 `npm run build`
+2. 打开 `about:debugging#/runtime/this-firefox`
+3. 点击「临时载入附加组件」，选择 `dist/firefox/manifest.json`
 
-如果当前 Firefox 版本要求文件名为 `manifest.json`，先备份现有文件再替换，验证后恢复：
-
-```powershell
-Copy-Item manifest.json manifest.chrome.backup.json
-Copy-Item manifest.firefox.json manifest.json
-# 验证完成后
-Move-Item -Force manifest.chrome.backup.json manifest.json
-```
-
-> 迁移完成后，`npm run build` 会生成 `dist/firefox/manifest.json`，无需手动复制。
+Firefox 使用 `manifests/firefox.json` 生成自己的清单（包含 `browser_specific_settings` 与 `background.scripts`），无需手动覆盖文件。
 
 ## 调试
 
@@ -72,7 +81,11 @@ Move-Item -Force manifest.chrome.backup.json manifest.json
 
 ### 修改后页面没有变化
 
-内容脚本只在页面加载时注入。修改 `content-script.js`、`defaults.js`、`lang.js` 或样式后，需要刷新目标页面；修改 `background.js` 后需在扩展页刷新。
+内容脚本只在页面加载时注入。修改源码后需要重新 `npm run build`、刷新扩展并刷新目标页面；仅修改 `background.js` 也需在扩展页刷新。
+
+### 生成的 lang.js 与源文件不一致
+
+不要直接编辑 `src/generated/lang.js`。修改 `_locales/{en,zh_CN}/messages.json` 后运行 `npm run gen:i18n`，或直接运行 `npm run build`。
 
 ### Firefox 下消息发送报错
 
@@ -92,10 +105,12 @@ Firefox 中 `chrome.tabs.sendMessage()` / `chrome.runtime.sendMessage()` 可能�
 
 ## 目录导航
 
-- `defaults.js`：默认规则、默认站点、`normalizeText`、`scanText`
-- `content-script.js`：站点适配、输入监听、发送拦截、警告 UI
-- `background.js`：首次安装初始化、旧配置迁移、配置广播
-- `lang.js`：运行时 i18n 与 DOM 渲染
-- `options.*` / `popup.*`：配置页与弹窗
-- `tests/unit/`：清单、i18n、扫描逻辑测试
+- `src/core/defaults.js`：默认规则、默认站点、`normalizeText`、`scanText`
+- `src/content/content-script.js`：站点适配、输入监听、发送拦截、警告 UI
+- `src/background/background.js`：首次安装初始化、旧配置迁移、配置广播
+- `src/ui/lang.template.js`：i18n 逻辑模板，构建时注入 `_locales` 文案
+- `src/ui/options.*` / `src/ui/popup.*`：配置页与弹窗
+- `manifests/`：共享清单与浏览器差异
+- `scripts/`：i18n、清单与构建脚本
+- `tests/unit/`：清单、构建、i18n、扫描逻辑测试
 - `docs/`：架构、测试、发布文档

@@ -12,6 +12,8 @@ node_modules/
 *.crx
 dist/
 build/
+src/generated/
+tests/.tmp/
 coverage/
 test-results/
 playwright-report/

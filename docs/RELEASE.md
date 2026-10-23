@@ -5,11 +5,7 @@
 ## 1. 准备版本
 
 - [ ] 确认 `main` 干净且 CI 通过
-- [ ] 更新版本号（四处必须一致，测试会校验）：
-  - `package.json`
-  - `manifest.json`
-  - `manifest.chrome.json`
-  - `manifest.firefox.json`
+- [ ] 更新版本号：只改 `package.json`（构建时注入两个清单，测试会校验）
 - [ ] 更新 `CHANGELOG.md`：把 `Unreleased` 改为 `vX.Y.Z - YYYY-MM-DD`
 - [ ] 检查 `README.md`、`privacy.html` 与实际行为一致
 - [ ] 提交：`chore(release): vX.Y.Z`
@@ -27,50 +23,25 @@ npm run verify
 - [ ] 检查扩展页面与 Service Worker 无未捕获异常
 - [ ] 确认未新增权限；如有，准备商店审核说明
 
-## 3. 打包
+## 3. 构建与打包
 
-当前没有 `build` 脚本，按下列文件清单打包。**不要**包含 `.git`、`node_modules`、`tests`、`docs`、`.github`、`package*.json` 等开发文件。
-
-需要包含：
-
-```text
-manifest.json
-background.js
-content-script.js
-content-style.css
-defaults.js
-lang.js
-options.html / options.css / options.js
-popup.html / popup.js
-privacy.html
-LICENSE
-icons/
-_locales/
+```bash
+npm run build
 ```
+
+构建会清空并重新生成 `dist/chrome` 与 `dist/firefox`，包含运行时文件、`_locales`、图标、`privacy.html`、`LICENSE` 以及对应清单。开发文件（`src/`、`tests/`、`docs/`、`scripts/`、`package*.json` 等）不会进入产物。
 
 PowerShell 示例：
 
 ```powershell
 $version = '1.1.0'
-$files = @(
-  'background.js','content-script.js','content-style.css','defaults.js','lang.js',
-  'options.html','options.css','options.js','popup.html','popup.js',
-  'privacy.html','LICENSE','icons','_locales'
-)
-
-New-Item -ItemType Directory -Force 'dist/chrome','dist/firefox' | Out-Null
-$files | ForEach-Object { Copy-Item -Recurse -Force $_ 'dist/chrome/' }
-$files | ForEach-Object { Copy-Item -Recurse -Force $_ 'dist/firefox/' }
-
-Copy-Item -Force 'manifest.json' 'dist/chrome/manifest.json'
-Copy-Item -Force 'manifest.firefox.json' 'dist/firefox/manifest.json'
-
 Compress-Archive -Path 'dist/chrome/*' -DestinationPath "dist/ai-guard-chrome-v$version.zip" -Force
 Compress-Archive -Path 'dist/firefox/*' -DestinationPath "dist/ai-guard-firefox-v$version.zip" -Force
 ```
 
 - [ ] 解压检查两个包内均有 `manifest.json`
-- [ ] Chrome 包使用 Chrome 清单；Firefox 包使用 Firefox 清单（含 `browser_specific_settings`）
+- [ ] 清单版本号与 `package.json` 一致
+- [ ] Chrome 包使用 `service_worker`；Firefox 包使用 `background.scripts` 且含 `browser_specific_settings`
 - [ ] 包内不含测试数据、真实密钥或开发依赖
 
 ## 4. Chrome Web Store

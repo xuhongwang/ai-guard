@@ -116,7 +116,7 @@
     "description": "Test panel description"
   },
   "testPlaceholder": {
-    "message": "Paste or type test text here... e.g.\nDatabase password: password=MyS3cret!\nOpenAI key: sk-1234567890abcdefghij",
+    "message": "Paste or type test text here...",
     "description": "Test textarea placeholder"
   },
   "btnFillDemo": {
@@ -184,11 +184,11 @@
     "description": "Site button selector placeholder"
   },
   "sitesTip": {
-    "message": "Tip: Input and send button selectors are CSS selectors. Press F12 in the target page to inspect elements (e.g. textarea#prompt, button[data-testid=\"send-button\"]). Leave empty for generic fallback.",
+    "message": "Tip: Input and send button selectors are CSS selectors. Press F12 in the target page to inspect elements.",
     "description": "Sites tip text"
   },
   "sitesNote": {
-    "message": "Note: This extension detects sensitive content and can block sending (only on error-level matches). It's recommended to configure the send button selector to ensure blocking works.",
+    "message": "Note: This extension detects sensitive content and can block sending (only on error-level matches).",
     "description": "Sites note text"
   },
   "footerScanOnPaste": {
@@ -235,40 +235,8 @@
     "message": "Send blocked — sensitive content detected (error level). Please remove and retry.",
     "description": "Block toast message"
   },
-  "descOpenAI": {
-    "message": "OpenAI API Key",
-    "description": "Rule description"
-  },
-  "descGitHub": {
-    "message": "GitHub Personal Token",
-    "description": "Rule description"
-  },
-  "descAWS": {
-    "message": "AWS Access Key",
-    "description": "Rule description"
-  },
-  "descGoogle": {
-    "message": "Google API Key",
-    "description": "Rule description"
-  },
-  "descPrivateKey": {
-    "message": "Private Key",
-    "description": "Rule description"
-  },
-  "descPassword": {
-    "message": "Plaintext Password",
-    "description": "Rule description"
-  },
-  "descInternalDomain": {
-    "message": "Internal Domain",
-    "description": "Rule description"
-  },
-  "descBusinessExample": {
-    "message": "Business keyword example",
-    "description": "Rule description example"
-  },
   "langLabel": {
-    "message": "EN",
+    "message": "中",
     "description": "Language switch button label"
   }
 }

@@ -1,6 +1,8 @@
 node_modules
 dist
 build
+src/generated
+tests/.tmp
 coverage
 test-results
 playwright-report

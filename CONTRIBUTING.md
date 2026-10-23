@@ -10,7 +10,8 @@
 
 ```bash
 npm ci
-npm run verify
+npm run verify   # lint + format:check + test + build
+npm run build    # 产物在 dist/chrome、dist/firefox
 ```
 
 受限网络下可将 npm 缓存指向工作区：
@@ -36,13 +37,12 @@ npm_config_cache=../.npm-cache npm ci
 
 ## 文案与 i18n
 
-UI 文案不得硬编码。当前需要同时更新：
+UI 文案不得硬编码。只修改：
 
 1. `_locales/en/messages.json`
 2. `_locales/zh_CN/messages.json`
-3. `lang.js` 中的 `MESSAGES`
 
-迁移完成后 `lang.js` 将由 `_locales` 生成，届时只需修改 `_locales`。
+然后运行 `npm run gen:i18n`。`src/generated/lang.js` 为生成物，不要手改或提交。
 
 ## 测试
 

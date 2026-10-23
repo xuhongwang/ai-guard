@@ -7,7 +7,6 @@
     "message": "在 AI 对话输入框中检测敏感关键字/正则并实时高亮提醒，可配置拦截发送。规则与站点可在配置页自定义。",
     "description": "Extension description"
   },
-
   "popupSubtitle": {
     "message": "敏感内容检测与提醒",
     "description": "Popup header subtitle"
@@ -32,13 +31,12 @@
     "message": "已启用规则：{count} 条",
     "description": "Rule count stat, {count} is placeholder"
   },
-
   "optionsTitle": {
     "message": "AI Guard · 规则配置",
     "description": "Options page title"
   },
   "optionsDesc": {
-    "message": "配置敏感内容检测规则。命中 error 级别将拦截发送，warn 级别仅警告。",
+    "message": "配置敏感内容检测规则。命中 <b>error</b> 级别将拦截发送，<b>warn</b> 级别仅警告。",
     "description": "Options page description"
   },
   "btnAddRule": {
@@ -109,7 +107,6 @@
     "message": "描述",
     "description": "Rule description input placeholder"
   },
-
   "testTitle": {
     "message": "测试规则",
     "description": "Test panel title"
@@ -119,7 +116,7 @@
     "description": "Test panel description"
   },
   "testPlaceholder": {
-    "message": "在此粘贴或输入测试文本…例如：\n连接数据库用密码 password=MyS3cret!\n调用 OpenAI 用 sk-1234567890abcdefghij",
+    "message": "在此粘贴或输入测试文本…",
     "description": "Test textarea placeholder"
   },
   "btnFillDemo": {
@@ -142,7 +139,6 @@
     "message": "{errors} 拦截、{warns} 警告 — 共 {total} 处命中：",
     "description": "Test result summary"
   },
-
   "sitesTitle": {
     "message": "站点配置",
     "description": "Site config section title"
@@ -188,14 +184,13 @@
     "description": "Site button selector placeholder"
   },
   "sitesTip": {
-    "message": "提示：输入框和发送按钮选择器均为 CSS 选择器。可按 F12 在目标网页审查元素获取（如 textarea#prompt、button[data-testid=\"send-button\"]）。留空则走通用兜底。",
+    "message": "提示：输入框和发送按钮选择器均为 CSS 选择器。可按 F12 在目标网页审查元素获取。留空则走通用兜底。",
     "description": "Sites tip text"
   },
   "sitesNote": {
     "message": "注：本插件可检测敏感内容并拦截发送（仅 error 级别命中时）。建议配置发送按钮选择器以确保拦截生效。",
     "description": "Sites note text"
   },
-
   "footerScanOnPaste": {
     "message": "粘贴时扫描",
     "description": "Footer: scan on paste checkbox"
@@ -204,7 +199,6 @@
     "message": "规则与站点配置实时同步到所有已打开的标签页。",
     "description": "Footer: sync hint"
   },
-
   "toastSaved": {
     "message": "已保存并同步",
     "description": "Toast: save success"
@@ -221,7 +215,6 @@
     "message": "格式错误：缺少 rules 数组",
     "description": "Import format error"
   },
-
   "warningBarTitle": {
     "message": "AI Guard：",
     "description": "Warning bar title prefix"
@@ -242,42 +235,8 @@
     "message": "发送已拦截 — 检测到敏感内容（error 级别），请清除后重试",
     "description": "Block toast message"
   },
-
-  "descOpenAI": {
-    "message": "OpenAI API Key",
-    "description": "Rule description"
-  },
-  "descGitHub": {
-    "message": "GitHub Personal Token",
-    "description": "Rule description"
-  },
-  "descAWS": {
-    "message": "AWS Access Key",
-    "description": "Rule description"
-  },
-  "descGoogle": {
-    "message": "Google API Key",
-    "description": "Rule description"
-  },
-  "descPrivateKey": {
-    "message": "私钥",
-    "description": "Rule description"
-  },
-  "descPassword": {
-    "message": "明文密码",
-    "description": "Rule description"
-  },
-  "descInternalDomain": {
-    "message": "内网域名",
-    "description": "Rule description"
-  },
-  "descBusinessExample": {
-    "message": "业务关键字示例",
-    "description": "Rule description example"
-  },
-
   "langLabel": {
-    "message": "中",
+    "message": "EN",
     "description": "Language switch button label"
   }
 }

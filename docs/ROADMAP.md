@@ -12,10 +12,10 @@
 - [x] 单元测试（清单、i18n、扫描逻辑）
 - [x] GitHub Actions CI 与 Dependabot
 - [x] README、贡献指南、架构 / 测试 / 发布文档、Issue / PR 模板
-- [ ] 迁移到 `src/` + `manifests/`
-- [ ] `_locales` 作为文案唯一源，生成 `lang.js`
-- [ ] copy-only 构建：`dist/chrome`、`dist/firefox`
-- [ ] 版本号单一来源（`package.json` → 清单）
+- [x] 迁移到 `src/` + `manifests/`
+- [x] `_locales` 作为文案唯一源，生成 `lang.js`
+- [x] copy-only 构建：`dist/chrome`、`dist/firefox`
+- [x] 版本号单一来源（`package.json` → 清单）
 
 ## Phase 2 — P0 修复
 

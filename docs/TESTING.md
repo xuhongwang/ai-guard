@@ -3,21 +3,22 @@
 ## 自动化测试
 
 ```bash
-npm test          # 仅单元测试
-npm run verify    # lint + format:check + test
+npm test          # 仅单元 / 构建测试
+npm run verify    # lint + format:check + test + build
 ```
 
 当前覆盖：
 
-- `tests/unit/manifests.test.mjs`：MV3 清单字段、版本一致性、content script 顺序、资源存在性、Chrome / Firefox 差异
-- `tests/unit/locales.test.mjs`：中英文键集合、空文案、占位符一致性、清单文案键
+- `tests/unit/manifests.test.mjs`：生成的 MV3 清单、版本一致性、content script 顺序、资源映射、Chrome / Firefox 差异
+- `tests/unit/locales.test.mjs`：中英文键集合、空文案、占位符一致性、运行时文案与 `_locales` 一致
 - `tests/unit/defaults.test.mjs`：归一化（零宽 / 全角）、关键字与正则匹配、非法输入、默认规则结构与代表性密钥检测
+- `tests/unit/build.test.mjs`：构建两个浏览器包，校验产物文件、清单与生成的 `lang.js`
 
 测试使用 Node 内置 `node:test`，不引入测试框架。新增纯逻辑时必须补测试，优先覆盖边界与抗变形场景。
 
 ## 手动冒烟
 
-涉及 DOM、站点适配、发送拦截与 i18n 的改动，至少在一个 Chromium 浏览器完成下表；发布前需覆盖 Chrome + Firefox。
+涉及 DOM、站点适配、发送拦截与 i18n 的改动，至少在一个 Chromium 浏览器完成下表；发布前需覆盖 Chrome + Firefox。手动测试前先运行 `npm run build`，并加载 `dist/chrome` 或 `dist/firefox`。
 
 ### 基础功能
 

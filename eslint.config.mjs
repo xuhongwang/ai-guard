@@ -7,6 +7,8 @@ export default [
       'node_modules/**',
       'dist/**',
       'build/**',
+      'src/generated/**',
+      'tests/.tmp/**',
       'coverage/**',
       'test-results/**',
       'playwright-report/**',
@@ -32,7 +34,7 @@ export default [
     },
   },
   {
-    files: ['content-script.js', 'options.js', 'popup.js'],
+    files: ['src/content/content-script.js', 'src/ui/options.js', 'src/ui/popup.js'],
     languageOptions: {
       globals: {
         L: 'readonly',

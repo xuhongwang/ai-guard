@@ -43,3 +43,14 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload dist
+        if: matrix.node == 20
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-guard-dist
+          path: dist/
+          retention-days: 14

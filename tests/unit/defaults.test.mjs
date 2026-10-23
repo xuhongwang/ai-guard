@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
-const source = readFileSync(new URL('../../defaults.js', import.meta.url), 'utf8');
+const source = readFileSync(new URL('../../src/core/defaults.js', import.meta.url), 'utf8');
 const sandbox = { window: {} };
 vm.createContext(sandbox);
 vm.runInContext(source, sandbox, { filename: 'defaults.js' });
