@@ -20,17 +20,23 @@
 
 ## 安装
 
+扩展产物需要先构建：
+
+```bash
+npm ci
+npm run build
+```
+
 ### Chrome（开发者模式）
 
 1. 打开 `chrome://extensions/`，开启右上角「开发者模式」
-2. 点击「加载已解压的扩展程序」，选择本仓库根目录（包含 `manifest.json`）
+2. 点击「加载已解压的扩展程序」，选择 `dist/chrome`
 3. 打开任意受支持的 AI 站点即可看到效果；点击工具栏图标可快速开关
 
 ### Firefox
 
 1. 打开 `about:debugging#/runtime/this-firefox`
-2. 点击「临时载入附加组件」，选择 `manifest.firefox.json`
-3. 若当前 Firefox 要求文件名必须为 `manifest.json`，请先备份并替换后再加载（后续构建流程会消除此步骤）
+2. 点击「临时载入附加组件」，选择 `dist/firefox/manifest.json`
 
 > 商店版本可能滞后于仓库。开发、测试与问题复现请使用仓库版本。Chrome 与 Firefox 均要求 Manifest V3，Firefox 需 109+。
 
@@ -55,18 +61,21 @@ AI Guard 不会上传、记录或分析你的输入内容：
 
 ```bash
 npm ci
-npm run verify   # lint + format:check + test
+npm run verify   # lint + format:check + test + build
 ```
 
 常用命令：
 
-| 命令                   | 说明                            |
-| ---------------------- | ------------------------------- |
-| `npm run lint`         | ESLint 检查                     |
-| `npm run format`       | Prettier 格式化                 |
-| `npm run format:check` | 校验格式                        |
-| `npm test`             | Node 内置测试运行器执行单元测试 |
-| `npm run verify`       | 提交前完整校验                  |
+| 命令                    | 说明                                       |
+| ----------------------- | ------------------------------------------ |
+| `npm run lint`          | ESLint 检查                                |
+| `npm run format`        | Prettier 格式化                            |
+| `npm run format:check`  | 校验格式                                   |
+| `npm test`              | Node 内置测试运行器执行单元测试            |
+| `npm run gen:i18n`      | 由 `_locales` 生成 `src/generated/lang.js` |
+| `npm run gen:manifests` | 生成清单到 `dist/<target>`                 |
+| `npm run build`         | 生成 `dist/chrome` 与 `dist/firefox`       |
+| `npm run verify`        | 提交前完整校验（含构建）                   |
 
 开发、调试与浏览器加载说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)，架构说明见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)，测试与发布清单见 [docs/TESTING.md](docs/TESTING.md) 与 [docs/RELEASE.md](docs/RELEASE.md)。
 
@@ -74,21 +83,26 @@ npm run verify   # lint + format:check + test
 
 ```text
 ai-guard/
-├── manifest.json           # Chrome MV3 清单
-├── manifest.chrome.json    # Chrome 清单副本（与 manifest.json 保持一致）
-├── manifest.firefox.json   # Firefox MV3 清单
-├── background.js           # Service worker：初始化、迁移与配置广播
-├── content-script.js       # 注入网页：扫描、站点适配、拦截与警告 UI
-├── content-style.css       # 警告条与高亮样式
-├── defaults.js             # 默认规则 / 站点 / 归一化 / 扫描实现
-├── lang.js                 # 运行时 i18n
-├── _locales/               # 浏览器扩展文案（en / zh_CN）
-├── options.html|css|js     # 配置页：规则、测试、站点
-├── popup.html|js           # 工具栏弹窗
-├── icons/                  # 图标
-├── tests/                  # 单元测试
-├── docs/                   # 开发、架构、测试、发布文档
-└── .github/                # CI、Issue / PR 模板
+├── src/
+│   ├── core/defaults.js            # 默认规则 / 站点 / 归一化 / 扫描实现
+│   ├── background/background.js    # Service worker：初始化、迁移与配置广播
+│   ├── content/                    # 注入网页：扫描、适配、拦截与警告 UI
+│   └── ui/                         # 配置页、弹窗、i18n 模板
+├── manifests/
+│   ├── base.json                   # 共享清单字段（版本号来自 package.json）
+│   ├── chrome.json                 # Chrome 差异：service worker
+│   └── firefox.json                # Firefox 差异：background scripts 与 gecko 配置
+├── scripts/
+│   ├── gen-i18n.mjs                # _locales → src/generated/lang.js
+│   ├── gen-manifests.mjs           # manifests/ → dist/<target>/manifest.json
+│   └── build.mjs                   # copy-only 构建到 dist/chrome、dist/firefox
+├── _locales/                       # 文案唯一源（en / zh_CN）
+├── icons/                          # 图标
+├── privacy.html                    # 隐私说明
+├── tests/                          # 单元测试
+├── docs/                           # 开发、架构、测试、发布文档
+├── dist/                           # 构建产物（忽略提交）
+└── .github/                        # CI、Issue / PR 模板
 ```
 
 ## 说明与限制

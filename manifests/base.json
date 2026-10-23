@@ -1,7 +1,6 @@
 {
   "manifest_version": 3,
   "name": "AI Guard",
-  "version": "1.0.0",
   "default_locale": "en",
   "description": "__MSG_extDesc__",
   "permissions": ["storage", "tabs"],
@@ -26,9 +25,6 @@
       "run_at": "document_idle"
     }
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
   "options_page": "options.html",
   "web_accessible_resources": [
     {

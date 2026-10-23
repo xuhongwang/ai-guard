@@ -3,23 +3,53 @@
 ## 设计目标
 
 - **本地优先**：所有检测在浏览器内完成，不产生网络请求
-- **最小权限**：仅使用 `storage` 与 `tabs`，不申请主机权限之外的额外能力
+- **最小权限**：仅使用 `storage` 与 `tabs`，不申请额外能力
 - **双浏览器兼容**：Chrome MV3 与 Firefox MV3（109+）共用同一套源码
-- **可直接加载**：无打包器，仓库文件即扩展产物，便于审计与商店审核
+- **可审计构建**：copy-only 构建，不压缩、不混淆、不打包，产物可直接比对源码
+
+## 源码布局
+
+| 路径                           | 职责                                                |
+| ------------------------------ | --------------------------------------------------- |
+| `src/core/defaults.js`         | 默认规则 / 站点、`normalizeText()`、`scanText()`    |
+| `src/background/background.js` | 首次安装初始化、`sync` → `local` 迁移、配置变更广播 |
+| `src/content/`                 | 内容脚本、站点适配、输入监听、拦截、高亮与警告条    |
+| `src/ui/lang.template.js`      | i18n 运行时逻辑，构建时注入文案                     |
+| `src/ui/options.*`             | 配置页：规则、测试面板、站点                        |
+| `src/ui/popup.*`               | 工具栏弹窗                                          |
+| `manifests/base.json`          | 共享清单字段                                        |
+| `manifests/chrome.json`        | Chrome 差异：`background.service_worker`            |
+| `manifests/firefox.json`       | Firefox 差异：`background.scripts` 与 gecko 配置    |
+| `scripts/`                     | 文案生成、清单生成、构建                            |
+| `_locales/`                    | 文案唯一源（`en` / `zh_CN`）                        |
+| `tests/`                       | 单元测试与构建测试                                  |
+
+构建产物写入 `dist/chrome` 与 `dist/firefox`，并保持扩展根目录扁平结构，清单中的路径与运行时相对引用不需要改写。
+
+## 构建流水线
+
+```text
+_locales/{en,zh_CN}/messages.json
+  → scripts/gen-i18n.mjs
+  → src/generated/lang.js
+  → dist/<target>/lang.js
+
+manifests/base.json + manifests/<target>.json + package.json.version
+  → scripts/gen-manifests.mjs
+  → dist/<target>/manifest.json
+
+src/**、_locales/、icons/、privacy.html、LICENSE
+  → scripts/build.mjs（复制）
+  → dist/chrome/、dist/firefox/
+```
+
+生成物 `src/generated/lang.js` 与整个 `dist/` 不提交。版本号只在 `package.json` 维护，构建时注入清单；测试会校验生成结果。
 
 ## 运行时组成
 
-| 组件           | 入口                  | 职责                                                |
-| -------------- | --------------------- | --------------------------------------------------- |
-| Background     | `background.js`       | 首次安装初始化、`sync` → `local` 迁移、配置变更广播 |
-| Content script | `content-script.js`   | 站点适配、输入监听、扫描、发送拦截、高亮与警告条    |
-| 默认数据与扫描 | `defaults.js`         | 默认规则 / 站点、`normalizeText()`、`scanText()`    |
-| 运行时 i18n    | `lang.js`             | 文案表、语言检测、DOM 渲染、语言切换                |
-| 配置页         | `options.html         | css                                                 | js`            | 规则增删改、测试面板、站点配置、导入导出 |
-| 弹窗           | `popup.html           | js`                                                 | 总开关与子开关 |
-| 扩展文案       | `_locales/{en,zh_CN}` | 清单 `name` / `description` 等浏览器级文案          |
+内容脚本按以下顺序注入：`defaults.js` → `lang.js` → `content-script.js`，运行时机为 `document_idle`，匹配 `<all_urls>`。脚本之间通过全局变量协作，`defaults.js` 把 API 挂到 `window.__AI_GUARD_DEFAULTS__`。
 
-内容脚本按以下顺序注入：`defaults.js` → `lang.js` → `content-script.js`，运行时机为 `document_idle`，匹配 `<all_urls>`。脚本之间通过全局变量协作，`defaults.js` 同时把 API 挂到 `window.__AI_GUARD_DEFAULTS__`。
+配置页与弹窗同样加载 `defaults.js` 与生成的 `lang.js`，因此三处共用同一份默认值与文案。
 
 ## 数据流
 
@@ -49,7 +79,7 @@
 1. 捕获 `keydown` 的 Enter（不含 Shift / Ctrl / Meta），命中 `error` 规则时 `preventDefault`
 2. 命中后禁用发送按钮，并拦截按钮点击
 
-配置以 `chrome.storage.local` 为唯一持久化位置；`lang.js` 的语言选择使用独立键 `ai_guard_lang`。
+配置以 `chrome.storage.local` 为唯一持久化位置；语言选择使用独立键 `ai_guard_lang`。
 
 ## 扫描与抗变形
 
@@ -59,6 +89,14 @@
 - 建立「归一化位置 ↔ 原始位置」映射，保证返回的 `match` 与 `index` 对应原始文本
 - 关键字匹配大小写不敏感；正则使用 `g` 标志逐次执行
 - 单条规则异常（如非法正则）会被跳过，不影响其他规则
+
+## i18n
+
+- `_locales/{en,zh_CN}/messages.json` 是唯一文案源
+- `extName` / `extDesc` 仅供浏览器清单使用，不注入运行时
+- `scripts/gen-i18n.mjs` 将文案注入 `src/ui/lang.template.js` 的占位符，生成 `src/generated/lang.js`，并用 Prettier 统一格式
+- 运行时 `L.init()` 读取 `chrome.storage.local` 的语言偏好，回退到浏览器语言
+- 新增文案时只需修改两个 `_locales` 文件并重新构建
 
 ## 站点适配
 
@@ -70,8 +108,8 @@
 
 - `lang.js` 的 `data-i18n-html` 分支使用 `textContent`，含标签的文案会显示字面量
 - 语言检测仅接受 `en` / `zh_CN`，`zh-CN`、`zh-TW` 等会被降级为英文
-- `background.js` 复制了一份默认规则，与 `defaults.js` 存在分叉风险
-- 配置更新存在三条通道（storage 监听、runtime 消息、background 广播），可能重复处理
+- `background.js` 复制了一份默认规则，与 `src/core/defaults.js` 存在分叉风险
+- 配置更新存在多条通道，可能重复处理
 - 内容脚本每 1.5s 轮询检查输入框，开销偏高
 - 每次扫描重新编译正则，长文本下成本较高
 - Enter 拦截未检查 `isComposing`，中文输入法选词回车可能被误拦截
@@ -80,37 +118,7 @@
 - 导入 JSON 缺少结构校验
 - Firefox 中 `chrome.*.sendMessage()` 可能返回 `undefined`，现有 `.catch()` 写法不兼容
 
-## 目标架构
-
-后续 PR 将迁移到以下布局，构建仍为 copy-only：
-
-```text
-src/
-├── core/            # 配置、归一化、扫描、规则校验（纯逻辑）
-├── content/         # 内容脚本、适配器、警告 UI
-├── background/      # service worker
-├── ui/              # options / popup
-└── locales/         # 文案源
-manifests/
-├── base.json
-├── chrome.json
-└── firefox.json
-scripts/
-├── gen-i18n.mjs     # _locales → src/locales/lang.js
-├── gen-manifests.mjs
-└── build.mjs        # 复制到 dist/chrome、dist/firefox
-dist/
-├── chrome/
-└── firefox/
-```
-
-迁移原则：
-
-1. 行为不变，先搬家再修 bug
-2. `_locales` 成为文案唯一源，`lang.js` 生成，不再手改
-3. 清单由 `manifests/` 生成，版本号单一来源
-4. 不引入打包器、不压缩、不改变运行时依赖
-5. 每个阶段独立 PR，CI 与手动冒烟同时通过
+后续修复计划见 [ROADMAP.md](ROADMAP.md)。
 
 ## 安全模型
 

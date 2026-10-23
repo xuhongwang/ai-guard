@@ -31,7 +31,7 @@
 - [ ] 一个 PR 只做一件事
 - [ ] 未新增网络请求、遥测、远程代码或远程配置
 - [ ] 权限无变化；如有，已说明必要性、隐私影响与审核理由
-- [ ] 文案已同步 `_locales/en`、`_locales/zh_CN` 与 `lang.js`
+- [ ] 文案只修改了 `_locales/en`、`_locales/zh_CN`，并已重新构建
 - [ ] 已更新 `CHANGELOG.md` 的 `Unreleased`
 - [ ] 行为或架构变化已同步更新文档
 - [ ] 未提交 `node_modules/`、`dist/`、缓存、日志或真实密钥

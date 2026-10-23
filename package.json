@@ -12,8 +12,11 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "gen:i18n": "node scripts/gen-i18n.mjs",
+    "gen:manifests": "node scripts/gen-manifests.mjs",
+    "build": "node scripts/build.mjs",
     "test": "node --test",
-    "verify": "npm run lint && npm run format:check && npm run test"
+    "verify": "npm run lint && npm run format:check && npm test && npm run build"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -11,6 +11,9 @@
 - GitHub Actions CI 与 Dependabot
 - 开发、架构、测试、发布、安全与路线图文档
 - Issue / Pull Request 模板
+- copy-only 构建：`src/` + `manifests/` → `dist/chrome`、`dist/firefox`
+- `_locales` → `src/generated/lang.js` 文案生成
+- 清单生成与 `package.json` 单一版本来源
 
 ### Changed
 
@@ -18,6 +21,9 @@
 - 统一换行为 LF，新增 `.gitattributes`
 - 使用 Prettier 格式化现有源码
 - `README` 重构，补充 English summary 与开发入口
+- 扩展开发改为先构建，再加载 `dist/chrome` / `dist/firefox`
+- 删除 `defaults.js` 中重复的 i18n 表，文案只维护 `_locales`
+- 清理 `_locales` 中未使用的规则描述键，并同步运行时文案
 
 ### Fixed
 

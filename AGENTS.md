@@ -7,17 +7,19 @@
 AI Guard 是一个 Chrome / Firefox Manifest V3 扩展，在 AI 网页输入框中本地检测敏感关键字与正则，按 `warn` / `error` 级别提示或拦截发送。
 
 - 纯前端扩展，**无网络请求、无遥测、无远程代码**
-- 无打包器：扩展直接加载仓库中的 `.js` / `.css` / `.html`
+- 无打包器：`npm run build` 仅复制并生成文件到 `dist/chrome`、`dist/firefox`
+- 源码在 `src/`，清单在 `manifests/`，文案源在 `_locales/`
+- `src/generated/lang.js` 与 `dist/` 为生成物，**不要手改或提交**
 - 多个脚本通过全局变量协作：`L`（i18n）、`DEFAULT_RULES` / `DEFAULT_SITES` / `DEFAULT_SETTINGS`、`normalizeText`、`scanText`，以及 `window.__AI_GUARD_DEFAULTS__`
-- 当前布局尚待迁移到 `src/` + `manifests/` + 生成式 `lang.js`（见 `docs/ARCHITECTURE.md` 的「目标架构」）
 
 ## 环境与命令
 
 - Node.js **20.19+**，npm 10+
 - 安装：`npm ci`
-- 校验：`npm run verify`（= lint + format:check + test）
-- 单项：`npm run lint`、`npm run format`、`npm test`
-- 尚无 `build` 脚本；迁移 PR 会新增 copy-only 构建，不引入打包器
+- 校验：`npm run verify`（= lint + format:check + test + build）
+- 单项：`npm run lint`、`npm run format`、`npm test`、`npm run build`
+- 生成：`npm run gen:i18n`（文案）、`npm run gen:manifests`（清单）
+- 构建为 copy-only，不引入打包器；产物在 `dist/`，不提交
 
 在受限环境中可用工作区内的缓存与配置，避免写入用户目录：
 
@@ -33,7 +35,7 @@ npm ci
 - 扩展代码不得使用 Node API、`eval`、动态远程脚本或 `new Function`
 - 保持 Chrome MV3 与 Firefox MV3 双兼容；Firefox 中 `chrome.*.sendMessage()` 可能返回 `undefined`，不要直接 `.catch()`
 - 新增跨脚本共享能力时，优先沿用 `window.__AI_GUARD_DEFAULTS__` 模式，并在 ESLint `globals` 中显式声明；不要制造新的隐式全局
-- UI 文案不得硬编码：同时更新 `_locales/en/messages.json`、`_locales/zh_CN/messages.json` 与 `lang.js` 的 `MESSAGES`（迁移后会由脚本生成）
+- UI 文案不得硬编码：只修改 `_locales/en/messages.json` 与 `_locales/zh_CN/messages.json`，`lang.js` 由 `npm run gen:i18n` 生成，勿手改
 - 不新增权限，除非 PR 中说明必要性、隐私影响与商店审核理由
 - 不引入运行时依赖；开发依赖需说明用途，并优先使用 Node 内置能力
 
@@ -60,4 +62,4 @@ npm ci
 
 ## 不要提交
 
-`node_modules/`、`dist/`、`build/`、`coverage/`、测试报告、`.npm-cache/`、编辑器配置、真实凭据或 `.env` 文件。
+`node_modules/`、`dist/`、`src/generated/`、`tests/.tmp/`、`build/`、`coverage/`、测试报告、`.npm-cache/`、编辑器配置、真实凭据或 `.env` 文件。
