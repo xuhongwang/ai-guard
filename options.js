@@ -47,51 +47,81 @@ function render(state) {
 
     const tdOn = document.createElement('td');
     const chk = document.createElement('input');
-    chk.type = 'checkbox'; chk.checked = rule.enabled;
-    chk.addEventListener('change', () => { rule.enabled = chk.checked; save(state); renderTest(); });
+    chk.type = 'checkbox';
+    chk.checked = rule.enabled;
+    chk.addEventListener('change', () => {
+      rule.enabled = chk.checked;
+      save(state);
+      renderTest();
+    });
     tdOn.appendChild(chk);
 
     const tdType = document.createElement('td');
     const selType = document.createElement('select');
     ['keyword', 'regex'].forEach((t) => {
       const o = document.createElement('option');
-      o.value = t; o.textContent = t === 'keyword' ? L.t('typeKeyword') : L.t('typeRegex');
+      o.value = t;
+      o.textContent = t === 'keyword' ? L.t('typeKeyword') : L.t('typeRegex');
       if (rule.type === t) o.selected = true;
       selType.appendChild(o);
     });
-    selType.addEventListener('change', () => { rule.type = selType.value; save(state); renderTest(); });
+    selType.addEventListener('change', () => {
+      rule.type = selType.value;
+      save(state);
+      renderTest();
+    });
     tdType.appendChild(selType);
 
     const tdPat = document.createElement('td');
     const inpPat = document.createElement('input');
-    inpPat.type = 'text'; inpPat.value = rule.pattern;
+    inpPat.type = 'text';
+    inpPat.value = rule.pattern;
     inpPat.placeholder = L.t('placeholderPattern');
-    inpPat.addEventListener('input', () => { rule.pattern = inpPat.value; save(state); renderTest(); });
+    inpPat.addEventListener('input', () => {
+      rule.pattern = inpPat.value;
+      save(state);
+      renderTest();
+    });
     tdPat.appendChild(inpPat);
 
     const tdDesc = document.createElement('td');
     const inpDesc = document.createElement('input');
-    inpDesc.type = 'text'; inpDesc.value = rule.desc || '';
-    inpDesc.placeholder = L.t('placeholderDesc'); inpDesc.addEventListener('input', () => { rule.desc = inpDesc.value; save(state); });
+    inpDesc.type = 'text';
+    inpDesc.value = rule.desc || '';
+    inpDesc.placeholder = L.t('placeholderDesc');
+    inpDesc.addEventListener('input', () => {
+      rule.desc = inpDesc.value;
+      save(state);
+    });
     tdDesc.appendChild(inpDesc);
 
     const tdSev = document.createElement('td');
     const selSev = document.createElement('select');
     ['error', 'warn'].forEach((s) => {
       const o = document.createElement('option');
-      o.value = s; o.textContent = s === 'error' ? L.t('severityError') : L.t('severityWarn');
+      o.value = s;
+      o.textContent = s === 'error' ? L.t('severityError') : L.t('severityWarn');
       if (rule.severity === s) o.selected = true;
       selSev.appendChild(o);
     });
-    selSev.addEventListener('change', () => { rule.severity = selSev.value; save(state); renderTest(); });
+    selSev.addEventListener('change', () => {
+      rule.severity = selSev.value;
+      save(state);
+      renderTest();
+    });
     tdSev.appendChild(selSev);
 
     const tdDel = document.createElement('td');
     const btnDel = document.createElement('button');
-    btnDel.className = 'del'; btnDel.textContent = L.t('btnDelete');
+    btnDel.className = 'del';
+    btnDel.textContent = L.t('btnDelete');
     btnDel.addEventListener('click', () => {
       state.rules.splice(idx, 1);
-      save(state, () => { render(state); renderSites(state); renderTest(); });
+      save(state, () => {
+        render(state);
+        renderSites(state);
+        renderTest();
+      });
     });
     tdDel.appendChild(btnDel);
 
@@ -115,23 +145,36 @@ function renderSites(state) {
 
     const tdOn = document.createElement('td');
     const chk = document.createElement('input');
-    chk.type = 'checkbox'; chk.checked = site.enabled;
-    chk.addEventListener('change', () => { site.enabled = chk.checked; save(state); });
+    chk.type = 'checkbox';
+    chk.checked = site.enabled;
+    chk.addEventListener('change', () => {
+      site.enabled = chk.checked;
+      save(state);
+    });
     tdOn.appendChild(chk);
 
     const mkInp = (field, placeholder) => {
       const inp = document.createElement('input');
-      inp.type = 'text'; inp.value = site[field] || ''; inp.placeholder = placeholder;
-      inp.addEventListener('input', () => { site[field] = inp.value; save(state); });
+      inp.type = 'text';
+      inp.value = site[field] || '';
+      inp.placeholder = placeholder;
+      inp.addEventListener('input', () => {
+        site[field] = inp.value;
+        save(state);
+      });
       return inp;
     };
-    const tdHost = document.createElement('td'); tdHost.appendChild(mkInp('host', L.t('placeholderHost')));
-    const tdInp  = document.createElement('td'); tdInp.appendChild(mkInp('inputSel', L.t('placeholderInputSel')));
-    const tdBtn  = document.createElement('td'); tdBtn.appendChild(mkInp('buttonSel', L.t('placeholderButtonSel')));
+    const tdHost = document.createElement('td');
+    tdHost.appendChild(mkInp('host', L.t('placeholderHost')));
+    const tdInp = document.createElement('td');
+    tdInp.appendChild(mkInp('inputSel', L.t('placeholderInputSel')));
+    const tdBtn = document.createElement('td');
+    tdBtn.appendChild(mkInp('buttonSel', L.t('placeholderButtonSel')));
 
     const tdDel = document.createElement('td');
     const btnDel = document.createElement('button');
-    btnDel.className = 'del'; btnDel.textContent = L.t('btnDelete');
+    btnDel.className = 'del';
+    btnDel.textContent = L.t('btnDelete');
     btnDel.addEventListener('click', () => {
       state.sites.custom.splice(idx, 1);
       save(state, () => renderSites(state));
@@ -167,7 +210,8 @@ function renderTest() {
 
   const fragment = document.createDocumentFragment();
   let cursor = 0;
-  let errors = 0, warns = 0;
+  let errors = 0,
+    warns = 0;
 
   if (hits.length === 0) {
     const noHits = document.createElement('span');
@@ -190,7 +234,8 @@ function renderTest() {
       mark.textContent = text.slice(r.start, r.end);
       fragment.appendChild(mark);
       cursor = Math.max(cursor, r.end);
-      if (r.hit.rule.severity === 'error') errors++; else warns++;
+      if (r.hit.rule.severity === 'error') errors++;
+      else warns++;
     });
     if (cursor < text.length) {
       fragment.appendChild(document.createTextNode(text.slice(cursor)));
@@ -214,9 +259,19 @@ function renderTest() {
 // =================== 交互绑定 ===================
 document.getElementById('btnAdd').addEventListener('click', () => {
   load((state) => {
-    state.rules.push({ id: 'k-' + Date.now(), type: 'keyword', pattern: '', desc: '', severity: 'warn', enabled: true });
+    state.rules.push({
+      id: 'k-' + Date.now(),
+      type: 'keyword',
+      pattern: '',
+      desc: '',
+      severity: 'warn',
+      enabled: true,
+    });
     lastState = state;
-    save(state, () => { render(state); renderTest(); });
+    save(state, () => {
+      render(state);
+      renderTest();
+    });
   });
 });
 
@@ -224,7 +279,10 @@ document.getElementById('btnReset').addEventListener('click', () => {
   if (!confirm(L.t('confirmReset'))) return;
   const fresh = getDefaults();
   lastState = fresh;
-  save(fresh, () => { render(fresh); renderTest(); });
+  save(fresh, () => {
+    render(fresh);
+    renderTest();
+  });
 });
 
 document.getElementById('btnExport').addEventListener('click', () => {
@@ -249,30 +307,47 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
     try {
       const data = JSON.parse(reader.result);
       if (!Array.isArray(data.rules)) throw new Error(L.t('importFormatError'));
-      load((cur) => {
+      load(() => {
         const fresh = getDefaults();
         const merged = Object.assign(fresh, data, { rules: data.rules });
         if (data.sites) merged.sites = data.sites;
         lastState = merged;
-        save(merged, () => { render(merged); renderTest(); });
+        save(merged, () => {
+          render(merged);
+          renderTest();
+        });
       });
-    } catch (err) { alert(L.t('importError', { error: err.message })); }
+    } catch (err) {
+      alert(L.t('importError', { error: err.message }));
+    }
   };
   reader.readAsText(file);
 });
 
 document.getElementById('scanOnPaste').addEventListener('change', (e) => {
-  load((state) => { state.scanOnPaste = e.target.checked; save(state); });
+  load((state) => {
+    state.scanOnPaste = e.target.checked;
+    save(state);
+  });
 });
 
 // ---- 站点配置交互 ----
 document.getElementById('builtinToggle').addEventListener('change', (e) => {
-  load((state) => { state.sites.builtin = e.target.checked; save(state); });
+  load((state) => {
+    state.sites.builtin = e.target.checked;
+    save(state);
+  });
 });
 
 document.getElementById('btnAddSite').addEventListener('click', () => {
   load((state) => {
-    state.sites.custom.push({ id: 's-' + Date.now(), host: '', inputSel: '', buttonSel: '', enabled: true });
+    state.sites.custom.push({
+      id: 's-' + Date.now(),
+      host: '',
+      inputSel: '',
+      buttonSel: '',
+      enabled: true,
+    });
     lastState = state;
     save(state, () => renderSites(state));
   });
@@ -283,8 +358,7 @@ document.getElementById('testInput').addEventListener('input', renderTest);
 
 document.getElementById('btnFillDemo').addEventListener('click', () => {
   const el = document.getElementById('testInput');
-  el.value =
-`数据库连接：mysql://root:MyS3cret@db.internal.corp:3306/prod
+  el.value = `数据库连接：mysql://root:MyS3cret@db.internal.corp:3306/prod
 调用大模型：sk-1234567890abcdefghijKLMN
 内网地址：https://gitlab.internal/api/v4
 普通文本：这里是一段正常的业务描述，不含敏感信息。

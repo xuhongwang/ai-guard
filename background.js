@@ -2,13 +2,55 @@
 
 // ---- 默认值（用于迁移和初始化） ----
 const DEFAULT_RULES = [
-  { type: 'regex', pattern: 'sk-[A-Za-z0-9_-]{20,}', severity: 'error', enabled: true, desc: 'OpenAI API Key' },
-  { type: 'regex', pattern: 'ghp_[a-zA-Z0-9]{36}', severity: 'error', enabled: true, desc: 'GitHub Token' },
-  { type: 'regex', pattern: 'AKIA[0-9A-Z]{16}', severity: 'error', enabled: true, desc: 'AWS Access Key' },
-  { type: 'regex', pattern: 'AIza[0-9A-Za-z_-]{35}', severity: 'error', enabled: true, desc: 'Google API Key' },
-  { type: 'regex', pattern: '-----BEGIN (RSA |EC |DSA |)?PRIVATE KEY-----', severity: 'error', enabled: true, desc: '私钥' },
-  { type: 'regex', pattern: '(password|passwd|pwd)\\s*[:=]\\s*\\S+', severity: 'warn', enabled: true, desc: '明文密码' },
-  { type: 'regex', pattern: '(^|[^a-z0-9-])([a-z0-9-]+\\.(internal|corp|local|lan)(\\.[a-z0-9-]+)*)([^a-z0-9-]|$)', severity: 'error', enabled: true, desc: '内网域名' },
+  {
+    type: 'regex',
+    pattern: 'sk-[A-Za-z0-9_-]{20,}',
+    severity: 'error',
+    enabled: true,
+    desc: 'OpenAI API Key',
+  },
+  {
+    type: 'regex',
+    pattern: 'ghp_[a-zA-Z0-9]{36}',
+    severity: 'error',
+    enabled: true,
+    desc: 'GitHub Token',
+  },
+  {
+    type: 'regex',
+    pattern: 'AKIA[0-9A-Z]{16}',
+    severity: 'error',
+    enabled: true,
+    desc: 'AWS Access Key',
+  },
+  {
+    type: 'regex',
+    pattern: 'AIza[0-9A-Za-z_-]{35}',
+    severity: 'error',
+    enabled: true,
+    desc: 'Google API Key',
+  },
+  {
+    type: 'regex',
+    pattern: '-----BEGIN (RSA |EC |DSA |)?PRIVATE KEY-----',
+    severity: 'error',
+    enabled: true,
+    desc: '私钥',
+  },
+  {
+    type: 'regex',
+    pattern: '(password|passwd|pwd)\\s*[:=]\\s*\\S+',
+    severity: 'warn',
+    enabled: true,
+    desc: '明文密码',
+  },
+  {
+    type: 'regex',
+    pattern: '(^|[^a-z0-9-])([a-z0-9-]+\\.(internal|corp|local|lan)(\\.[a-z0-9-]+)*)([^a-z0-9-]|$)',
+    severity: 'error',
+    enabled: true,
+    desc: '内网域名',
+  },
 ];
 
 const DEFAULT_SETTINGS = {

@@ -4,7 +4,9 @@
   border: 3px solid #ff4444 !important;
   background-color: #fff5f5 !important;
   box-shadow: 0 0 10px rgba(255, 0, 0, 0.3) !important;
-  transition: background-color 0.2s, box-shadow 0.2s;
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s;
 }
 
 #__ai-guard-bar {
@@ -20,7 +22,7 @@
   line-height: 1.5;
   text-align: center;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  font-family: -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
@@ -32,7 +34,13 @@
 }
 
 @keyframes __ai-guard-fadeout {
-  0% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }

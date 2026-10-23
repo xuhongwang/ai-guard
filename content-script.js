@@ -1,12 +1,15 @@
-/* eslint-disable */
 (function () {
   if (window.__AI_GUARD_INSTALLED__) return;
   window.__AI_GUARD_INSTALLED__ = true;
 
   // ============ Scanner ============
   class Scanner {
-    constructor(rules) { this.rules = rules || []; }
-    setRules(rules) { this.rules = rules || []; }
+    constructor(rules) {
+      this.rules = rules || [];
+    }
+    setRules(rules) {
+      this.rules = rules || [];
+    }
     scan(text) {
       if (!text) return [];
       const normalized = _norm(text);
@@ -23,7 +26,9 @@
             const needle = String(rule.pattern).toLowerCase();
             if (needle && haystack.includes(needle)) hits.push(rule);
           }
-        } catch (e) { /* 非法规则跳过 */ }
+        } catch (e) {
+          /* 非法规则跳过 */
+        }
       }
       return hits;
     }
@@ -33,11 +38,13 @@
   const BUILTIN = {
     'chat.openai.com': {
       input: () => document.querySelector('#prompt-textarea, textarea, [contenteditable="true"]'),
-      button: () => document.querySelector('button[data-testid="send-button"], button[aria-label*="Send"]'),
+      button: () =>
+        document.querySelector('button[data-testid="send-button"], button[aria-label*="Send"]'),
     },
     'chatgpt.com': {
       input: () => document.querySelector('#prompt-textarea, textarea, [contenteditable="true"]'),
-      button: () => document.querySelector('button[data-testid="send-button"], button[aria-label*="Send"]'),
+      button: () =>
+        document.querySelector('button[data-testid="send-button"], button[aria-label*="Send"]'),
     },
     'claude.ai': {
       input: () => document.querySelector('[contenteditable="true"]'),
@@ -45,27 +52,40 @@
     },
     'copilot.microsoft.com': {
       input: () => document.querySelector('textarea, [contenteditable="true"]'),
-      button: () => document.querySelector('button[aria-label*="Submit"], button[aria-label*="Send"]'),
+      button: () =>
+        document.querySelector('button[aria-label*="Submit"], button[aria-label*="Send"]'),
     },
     'm365.cloud.microsoft': {
       input: () => document.querySelector('textarea, [contenteditable="true"]'),
-      button: () => document.querySelector('button[aria-label*="Submit"], button[aria-label*="Send"]'),
+      button: () =>
+        document.querySelector('button[aria-label*="Submit"], button[aria-label*="Send"]'),
     },
     'gemini.google.com': {
       input: () => document.querySelector('textarea, [contenteditable="true"]'),
       button: () => document.querySelector('button.send-button, button[aria-label*="Send"]'),
     },
     'www.doubao.com': {
-      input: () => document.querySelector('[data-slate-editor="true"], textarea, [contenteditable="true"]'),
-      button: () => document.querySelector('[data-testid="send-button"], button[aria-label*="发送"], button[aria-label*="Send"], button[aria-label*="提交"]'),
+      input: () =>
+        document.querySelector('[data-slate-editor="true"], textarea, [contenteditable="true"]'),
+      button: () =>
+        document.querySelector(
+          '[data-testid="send-button"], button[aria-label*="发送"], button[aria-label*="Send"], button[aria-label*="提交"]',
+        ),
     },
     'yuanbao.tencent.com': {
-      input: () => document.querySelector('textarea, [contenteditable="true"], [data-slate-editor="true"]'),
-      button: () => document.querySelector('#yuanbao-send-btn, button[data-testid="send-button"], button[aria-label*="发送"], button[aria-label*="Send"], button[aria-label*="提交"], div[aria-label*="发送"]'),
+      input: () =>
+        document.querySelector('textarea, [contenteditable="true"], [data-slate-editor="true"]'),
+      button: () =>
+        document.querySelector(
+          '#yuanbao-send-btn, button[data-testid="send-button"], button[aria-label*="发送"], button[aria-label*="Send"], button[aria-label*="提交"], div[aria-label*="发送"]',
+        ),
     },
     'kimi.moonshot.cn': {
       input: () => document.querySelector('textarea, [contenteditable="true"]'),
-      button: () => document.querySelector('button[data-testid="send-button"], button[aria-label*="发送"], button[aria-label*="Send"], button[aria-label*="提交"]'),
+      button: () =>
+        document.querySelector(
+          'button[data-testid="send-button"], button[aria-label*="发送"], button[aria-label*="Send"], button[aria-label*="提交"]',
+        ),
     },
   };
 
@@ -131,16 +151,18 @@
     };
   }
   function fallbackInput() {
-    return document.querySelector('textarea, [contenteditable="true"], [data-slate-editor="true"], input[type="text"]');
+    return document.querySelector(
+      'textarea, [contenteditable="true"], [data-slate-editor="true"], input[type="text"]',
+    );
   }
   function fallbackButton() {
     return document.querySelector(
       'button[data-testid="send-button"], ' +
-      'button[aria-label*="Send"], button[aria-label*="发送"], ' +
-      'button[aria-label*="提交"], button[aria-label*="Submit"], ' +
-      'button[aria-label*="回复"], button[aria-label*="Reply"], ' +
-      'div[aria-label*="发送"], div[aria-label*="Send"], ' +
-      '[id*="send-btn"], [id*="send-button"]'
+        'button[aria-label*="Send"], button[aria-label*="发送"], ' +
+        'button[aria-label*="提交"], button[aria-label*="Submit"], ' +
+        'button[aria-label*="回复"], button[aria-label*="Reply"], ' +
+        'div[aria-label*="发送"], div[aria-label*="Send"], ' +
+        '[id*="send-btn"], [id*="send-button"]',
     );
   }
 
@@ -149,28 +171,94 @@
   let _pollId = null;
   function isContextValid() {
     if (_dead) return false;
-    try { chrome.runtime.getManifest(); return true; } catch { _dead = true; if (_pollId) { clearInterval(_pollId); _pollId = null; } return false; }
+    try {
+      chrome.runtime.getManifest();
+      return true;
+    } catch {
+      _dead = true;
+      if (_pollId) {
+        clearInterval(_pollId);
+        _pollId = null;
+      }
+      return false;
+    }
   }
 
   // ============ Main ============
   // 默认规则以 defaults.js（已通过 manifest 在 content-script 之前注入）的 DEFAULT_RULES 为唯一来源，
   // 保证与"测试规则"面板逻辑完全一致；若取不到则降级为内联副本（兼容直接单文件运行/测试）。
   const FALLBACK_RULES = [
-    { type: 'regex', pattern: 'sk-[A-Za-z0-9_-]{20,}', severity: 'error', enabled: true, desc: 'OpenAI API Key' },
-    { type: 'regex', pattern: 'ghp_[a-zA-Z0-9]{36}', severity: 'error', enabled: true, desc: 'GitHub Token' },
-    { type: 'regex', pattern: 'AKIA[0-9A-Z]{16}', severity: 'error', enabled: true, desc: 'AWS Access Key' },
-    { type: 'regex', pattern: 'AIza[0-9A-Za-z_-]{35}', severity: 'error', enabled: true, desc: 'Google API Key' },
-    { type: 'regex', pattern: '-----BEGIN (RSA |EC |DSA |)?PRIVATE KEY-----', severity: 'error', enabled: true, desc: '私钥' },
-    { type: 'regex', pattern: '(password|passwd|pwd)\\s*[:=]\\s*\\S+', severity: 'warn', enabled: true, desc: '明文密码' },
-    { type: 'regex', pattern: '(^|[^a-z0-9-])([a-z0-9-]+\\.(internal|corp|local|lan)(\\.[a-z0-9-]+)*)([^a-z0-9-]|$)', severity: 'error', enabled: true, desc: '内网域名' },
+    {
+      type: 'regex',
+      pattern: 'sk-[A-Za-z0-9_-]{20,}',
+      severity: 'error',
+      enabled: true,
+      desc: 'OpenAI API Key',
+    },
+    {
+      type: 'regex',
+      pattern: 'ghp_[a-zA-Z0-9]{36}',
+      severity: 'error',
+      enabled: true,
+      desc: 'GitHub Token',
+    },
+    {
+      type: 'regex',
+      pattern: 'AKIA[0-9A-Z]{16}',
+      severity: 'error',
+      enabled: true,
+      desc: 'AWS Access Key',
+    },
+    {
+      type: 'regex',
+      pattern: 'AIza[0-9A-Za-z_-]{35}',
+      severity: 'error',
+      enabled: true,
+      desc: 'Google API Key',
+    },
+    {
+      type: 'regex',
+      pattern: '-----BEGIN (RSA |EC |DSA |)?PRIVATE KEY-----',
+      severity: 'error',
+      enabled: true,
+      desc: '私钥',
+    },
+    {
+      type: 'regex',
+      pattern: '(password|passwd|pwd)\\s*[:=]\\s*\\S+',
+      severity: 'warn',
+      enabled: true,
+      desc: '明文密码',
+    },
+    {
+      type: 'regex',
+      pattern:
+        '(^|[^a-z0-9-])([a-z0-9-]+\\.(internal|corp|local|lan)(\\.[a-z0-9-]+)*)([^a-z0-9-]|$)',
+      severity: 'error',
+      enabled: true,
+      desc: '内网域名',
+    },
   ];
-  const DEFAULT_RULES = (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.DEFAULT_RULES) || FALLBACK_RULES;
+  const DEFAULT_RULES =
+    (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.DEFAULT_RULES) || FALLBACK_RULES;
 
-  const _norm = (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.normalizeText) || function (t) {
-    return t.replace(/[\u200B-\u200F\uFEFF\u2060\u00AD]/g, '').replace(/[\uFF01-\uFF5E]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/\u3000/g, ' ');
+  const _norm =
+    (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.normalizeText) ||
+    function (t) {
+      return t
+        .replace(/[\u200B-\u200F\uFEFF\u2060\u00AD]/g, '')
+        .replace(/[\uFF01-\uFF5E]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+        .replace(/\u3000/g, ' ');
+    };
+
+  let settings = {
+    enabled: true,
+    visualWarning: true,
+    blockSend: true,
+    scanOnPaste: true,
+    rules: DEFAULT_RULES,
+    sites: { builtin: true, custom: [] },
   };
-
-  let settings = { enabled: true, visualWarning: true, blockSend: true, scanOnPaste: true, rules: DEFAULT_RULES, sites: { builtin: true, custom: [] } };
   const scanner = new Scanner(settings.rules);
   let adapter = buildAdapter(settings.sites);
   let currentHits = [];
@@ -188,7 +276,10 @@
 
   // ---- 从 storage 加载配置 ----
   function loadSettings(cb) {
-    if (!isContextValid()) { cb && cb(); return; }
+    if (!isContextValid()) {
+      cb && cb();
+      return;
+    }
     try {
       chrome.storage.local.get(['settings'], (res) => {
         try {
@@ -196,7 +287,9 @@
           cb && cb();
         } catch {}
       });
-    } catch { cb && cb(); }
+    } catch {
+      cb && cb();
+    }
   }
 
   // ---- 路径 1: storage.onChanged（area=local） ----
@@ -209,7 +302,10 @@
             applyConfig(changes.settings.newValue);
           }
           if (changes.ai_guard_lang) {
-            L.init().then(() => { clearWarning(); recheck(); });
+            L.init().then(() => {
+              clearWarning();
+              recheck();
+            });
           }
         }
       } catch {}
@@ -222,7 +318,10 @@
       try {
         if (!isContextValid()) return;
         if (msg && msg.type === 'AI_GUARD_CONFIG_CHANGED') {
-          loadSettings(() => { clearWarning(); recheck(); });
+          loadSettings(() => {
+            clearWarning();
+            recheck();
+          });
         }
       } catch {}
     });
@@ -245,7 +344,7 @@
   // 在当前页面中查找第一个可见的输入框（适配器命中隐藏元素时兜底）
   function findVisibleInput() {
     const list = document.querySelectorAll(
-      'textarea, [contenteditable="true"], [data-slate-editor="true"], input[type="text"]'
+      'textarea, [contenteditable="true"], [data-slate-editor="true"], input[type="text"]',
     );
     for (const el of list) {
       if (isVisible(el)) return el;
@@ -254,7 +353,9 @@
   }
 
   function clearWarning() {
-    document.querySelectorAll('.__ai-guard-danger').forEach((el) => el.classList.remove('__ai-guard-danger'));
+    document
+      .querySelectorAll('.__ai-guard-danger')
+      .forEach((el) => el.classList.remove('__ai-guard-danger'));
     const bar = document.getElementById('__ai-guard-bar');
     if (bar) bar.remove();
   }
@@ -284,7 +385,10 @@
     const blocked = settings.blockSend && hasError;
     const summary = L.t('warningBarSummary', { total: hits.length, errors, warns });
     const blockedText = blocked ? L.t('warningBlocked') : L.t('warningAllowed');
-    const descList = hits.map((h) => h.desc || h.pattern).filter(Boolean).join(', ');
+    const descList = hits
+      .map((h) => h.desc || h.pattern)
+      .filter(Boolean)
+      .join(', ');
     bar.replaceChildren();
     const b = document.createElement('b');
     b.textContent = `🚨 ${L.t('warningBarTitle')}`;
@@ -328,87 +432,115 @@
   }
 
   // ---- 事件监听器（只注册一次，运行时读 settings 控制行为） ----
-  document.addEventListener('input', (e) => {
-    if (!settings.enabled) return;
-    if (isMyInput(e.target)) recheck();
-  }, true);
+  document.addEventListener(
+    'input',
+    (e) => {
+      if (!settings.enabled) return;
+      if (isMyInput(e.target)) recheck();
+    },
+    true,
+  );
 
   // paste 监听器：始终注册，运行时检查 scanOnPaste
-  document.addEventListener('paste', () => {
-    if (settings.enabled && settings.scanOnPaste) setTimeout(recheck, 0);
-  }, true);
+  document.addEventListener(
+    'paste',
+    () => {
+      if (settings.enabled && settings.scanOnPaste) setTimeout(recheck, 0);
+    },
+    true,
+  );
 
   // 拦截 Enter 键（仅当 blockSend 开启且有 error 级别命中时）
-  document.addEventListener('keydown', (e) => {
-    if (!settings.enabled || !settings.blockSend) return;
-    if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.metaKey) return;
-    const hasError = currentHits.some(h => h.severity === 'error');
-    if (!hasError) return;
-    const el = adapter.input();
-    if (!el) return;
-    if (el === e.target || el.contains(e.target)) {
-      e.preventDefault();
-      e.stopPropagation();
-      showBlockToast();
-    }
-  }, true);
+  document.addEventListener(
+    'keydown',
+    (e) => {
+      if (!settings.enabled || !settings.blockSend) return;
+      if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.metaKey) return;
+      const hasError = currentHits.some((h) => h.severity === 'error');
+      if (!hasError) return;
+      const el = adapter.input();
+      if (!el) return;
+      if (el === e.target || el.contains(e.target)) {
+        e.preventDefault();
+        e.stopPropagation();
+        showBlockToast();
+      }
+    },
+    true,
+  );
 
   // 拦截所有按钮/可点击元素（仅当 blockSend 开启且有 error 级别命中时）
-  document.addEventListener('click', (e) => {
-    if (!settings.enabled || !settings.blockSend) return;
-    const hasError = currentHits.some(h => h.severity === 'error');
-    if (!hasError) return;
-    const btn = e.target.closest(
-      'button, [role="button"], [type="submit"], input[type="submit"], ' +
-      'div[aria-label], span[aria-label], a[aria-label], ' +
-      '[id*="send"], [id*="submit"]'
-    );
-    if (!btn) return;
-    const label = (btn.getAttribute('aria-label') || '').toLowerCase();
-    const id = (btn.id || '').toLowerCase();
-    const cls = (btn.className || '').toLowerCase();
-    const isSendBtn = /send|发送|提交|submit|回复|reply/.test(label + id + cls);
-    if (isSendBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      showBlockToast();
-    }
-  }, true);
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (!settings.enabled || !settings.blockSend) return;
+      const hasError = currentHits.some((h) => h.severity === 'error');
+      if (!hasError) return;
+      const btn = e.target.closest(
+        'button, [role="button"], [type="submit"], input[type="submit"], ' +
+          'div[aria-label], span[aria-label], a[aria-label], ' +
+          '[id*="send"], [id*="submit"]',
+      );
+      if (!btn) return;
+      const label = (btn.getAttribute('aria-label') || '').toLowerCase();
+      const id = (btn.id || '').toLowerCase();
+      const cls = (btn.className || '').toLowerCase();
+      const isSendBtn = /send|发送|提交|submit|回复|reply/.test(label + id + cls);
+      if (isSendBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        showBlockToast();
+      }
+    },
+    true,
+  );
 
   // 拦截 SVG 图标按钮点击（很多 AI 网站用 div > svg 做发送按钮）
-  document.addEventListener('click', (e) => {
-    if (!settings.enabled || !settings.blockSend) return;
-    const hasError = currentHits.some(h => h.severity === 'error');
-    if (!hasError) return;
-    const svg = e.target.closest('svg');
-    if (!svg) return;
-    const parent = svg.parentElement;
-    if (!parent) return;
-    const label = (parent.getAttribute('aria-label') || parent.getAttribute('id') || '').toLowerCase();
-    const cls = (parent.className || '').toLowerCase();
-    if (/send|发送|提交|submit/.test(label + cls)) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      showBlockToast();
-    }
-  }, true);
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (!settings.enabled || !settings.blockSend) return;
+      const hasError = currentHits.some((h) => h.severity === 'error');
+      if (!hasError) return;
+      const svg = e.target.closest('svg');
+      if (!svg) return;
+      const parent = svg.parentElement;
+      if (!parent) return;
+      const label = (
+        parent.getAttribute('aria-label') ||
+        parent.getAttribute('id') ||
+        ''
+      ).toLowerCase();
+      const cls = (parent.className || '').toLowerCase();
+      if (/send|发送|提交|submit/.test(label + cls)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        showBlockToast();
+      }
+    },
+    true,
+  );
 
   // 拦截表单提交（仅当 blockSend 开启且有 error 级别命中时）
-  document.addEventListener('submit', (e) => {
-    if (!settings.enabled || !settings.blockSend) return;
-    const hasError = currentHits.some(h => h.severity === 'error');
-    if (!hasError) return;
-    const inputEl = adapter.input();
-    if (!inputEl) return;
-    const form = e.target;
-    if (form.contains && form.contains(inputEl)) {
-      e.preventDefault();
-      e.stopPropagation();
-      showBlockToast();
-    }
-  }, true);
+  document.addEventListener(
+    'submit',
+    (e) => {
+      if (!settings.enabled || !settings.blockSend) return;
+      const hasError = currentHits.some((h) => h.severity === 'error');
+      if (!hasError) return;
+      const inputEl = adapter.input();
+      if (!inputEl) return;
+      const form = e.target;
+      if (form.contains && form.contains(inputEl)) {
+        e.preventDefault();
+        e.stopPropagation();
+        showBlockToast();
+      }
+    },
+    true,
+  );
 
   // 显示拦截提示
   function showBlockToast() {
@@ -454,7 +586,9 @@
     loadSettings(() => {
       recheck();
       setTimeout(recheck, 500);
-      _pollId = setInterval(() => { if (!onNavigate()) recheck(); }, 1500);
+      _pollId = setInterval(() => {
+        if (!onNavigate()) recheck();
+      }, 1500);
     });
   });
 })();
