@@ -50,7 +50,7 @@ test('build produces loadable Chrome and Firefox packages', async () => {
     );
 
     assert.equal(chromeManifest.background.service_worker, 'background.js');
-    assert.deepEqual(firefoxManifest.background.scripts, ['background.js']);
+    assert.deepEqual(firefoxManifest.background.scripts, ['defaults.js', 'background.js']);
 
     const generated = readFileSync(path.join(outRoot, 'chrome', 'lang.js'), 'utf8');
     assert.match(generated, /const MESSAGES = \{/);

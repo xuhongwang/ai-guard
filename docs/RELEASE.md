@@ -49,7 +49,7 @@ Compress-Archive -Path 'dist/firefox/*' -DestinationPath "dist/ai-guard-firefox-
 - [ ] 开发者后台 → 上传 `ai-guard-chrome-vX.Y.Z.zip`
 - [ ] 更新商店文案与截图（如界面有变化）
 - [ ] 隐私实践：声明不收集用户数据
-- [ ] 权限说明：`storage`（保存本地配置）、`tabs`（向已打开标签页广播配置变更）
+- [ ] 权限说明：`storage`（保存本地配置，内容脚本通过 `storage.onChanged` 自动更新）
 - [ ] 版本说明填写本次变更
 - [ ] 选择发布范围 / 分阶段发布
 - [ ] 提交审核并记录提交时间

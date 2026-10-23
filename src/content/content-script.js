@@ -2,37 +2,9 @@
   if (window.__AI_GUARD_INSTALLED__) return;
   window.__AI_GUARD_INSTALLED__ = true;
 
-  // ============ Scanner ============
-  class Scanner {
-    constructor(rules) {
-      this.rules = rules || [];
-    }
-    setRules(rules) {
-      this.rules = rules || [];
-    }
-    scan(text) {
-      if (!text) return [];
-      const normalized = _norm(text);
-      const hits = [];
-      for (const rule of this.rules) {
-        if (!rule || !rule.enabled) continue;
-        try {
-          if (rule.type === 'regex') {
-            const re = new RegExp(rule.pattern, 'g');
-            if (re.test(normalized)) hits.push(rule);
-            re.lastIndex = 0;
-          } else {
-            const haystack = normalized.toLowerCase();
-            const needle = String(rule.pattern).toLowerCase();
-            if (needle && haystack.includes(needle)) hits.push(rule);
-          }
-        } catch (e) {
-          /* 非法规则跳过 */
-        }
-      }
-      return hits;
-    }
-  }
+  const DEFAULTS = window.__AI_GUARD_DEFAULTS__;
+  if (!DEFAULTS) return;
+  const { DEFAULT_RULES, DEFAULT_SETTINGS, scanText } = DEFAULTS;
 
   // ============ Site Adapters ============
   const BUILTIN = {
@@ -185,81 +157,7 @@
   }
 
   // ============ Main ============
-  // 默认规则以 defaults.js（已通过 manifest 在 content-script 之前注入）的 DEFAULT_RULES 为唯一来源，
-  // 保证与"测试规则"面板逻辑完全一致；若取不到则降级为内联副本（兼容直接单文件运行/测试）。
-  const FALLBACK_RULES = [
-    {
-      type: 'regex',
-      pattern: 'sk-[A-Za-z0-9_-]{20,}',
-      severity: 'error',
-      enabled: true,
-      desc: 'OpenAI API Key',
-    },
-    {
-      type: 'regex',
-      pattern: 'ghp_[a-zA-Z0-9]{36}',
-      severity: 'error',
-      enabled: true,
-      desc: 'GitHub Token',
-    },
-    {
-      type: 'regex',
-      pattern: 'AKIA[0-9A-Z]{16}',
-      severity: 'error',
-      enabled: true,
-      desc: 'AWS Access Key',
-    },
-    {
-      type: 'regex',
-      pattern: 'AIza[0-9A-Za-z_-]{35}',
-      severity: 'error',
-      enabled: true,
-      desc: 'Google API Key',
-    },
-    {
-      type: 'regex',
-      pattern: '-----BEGIN (RSA |EC |DSA |)?PRIVATE KEY-----',
-      severity: 'error',
-      enabled: true,
-      desc: '私钥',
-    },
-    {
-      type: 'regex',
-      pattern: '(password|passwd|pwd)\\s*[:=]\\s*\\S+',
-      severity: 'warn',
-      enabled: true,
-      desc: '明文密码',
-    },
-    {
-      type: 'regex',
-      pattern:
-        '(^|[^a-z0-9-])([a-z0-9-]+\\.(internal|corp|local|lan)(\\.[a-z0-9-]+)*)([^a-z0-9-]|$)',
-      severity: 'error',
-      enabled: true,
-      desc: '内网域名',
-    },
-  ];
-  const DEFAULT_RULES =
-    (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.DEFAULT_RULES) || FALLBACK_RULES;
-
-  const _norm =
-    (window.__AI_GUARD_DEFAULTS__ && window.__AI_GUARD_DEFAULTS__.normalizeText) ||
-    function (t) {
-      return t
-        .replace(/[\u200B-\u200F\uFEFF\u2060\u00AD]/g, '')
-        .replace(/[\uFF01-\uFF5E]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
-        .replace(/\u3000/g, ' ');
-    };
-
-  let settings = {
-    enabled: true,
-    visualWarning: true,
-    blockSend: true,
-    scanOnPaste: true,
-    rules: DEFAULT_RULES,
-    sites: { builtin: true, custom: [] },
-  };
-  const scanner = new Scanner(settings.rules);
+  let settings = Object.assign({}, DEFAULT_SETTINGS);
   let adapter = buildAdapter(settings.sites);
   let currentHits = [];
 
@@ -268,7 +166,6 @@
     settings = Object.assign(settings, cfg || {});
     if (!Array.isArray(settings.rules)) settings.rules = DEFAULT_RULES;
     if (!settings.sites) settings.sites = { builtin: true, custom: [] };
-    scanner.setRules(settings.rules);
     adapter = buildAdapter(settings.sites);
     clearWarning();
     recheck();
@@ -292,7 +189,7 @@
     }
   }
 
-  // ---- 路径 1: storage.onChanged（area=local） ----
+  // ---- 配置更新：storage.onChanged（area=local） ----
   try {
     chrome.storage.onChanged.addListener((changes, area) => {
       try {
@@ -307,21 +204,6 @@
               recheck();
             });
           }
-        }
-      } catch {}
-    });
-  } catch {}
-
-  // ---- 路径 2: runtime.onMessage（background 广播） ----
-  try {
-    chrome.runtime.onMessage.addListener((msg) => {
-      try {
-        if (!isContextValid()) return;
-        if (msg && msg.type === 'AI_GUARD_CONFIG_CHANGED') {
-          loadSettings(() => {
-            clearWarning();
-            recheck();
-          });
         }
       } catch {}
     });
@@ -379,14 +261,24 @@
       bar.addEventListener('mouseenter', () => toggleBarPosition(bar));
       document.body.prepend(bar);
     }
-    const errors = hits.filter((h) => h.severity === 'error').length;
-    const warns = hits.length - errors;
+    const rules = [];
+    const seen = new Set();
+    for (const hit of hits) {
+      const rule = hit.rule;
+      if (!rule) continue;
+      const key = rule.id || rule.pattern;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      rules.push(rule);
+    }
+    const errors = rules.filter((rule) => rule.severity === 'error').length;
+    const warns = rules.length - errors;
     const hasError = errors > 0;
     const blocked = settings.blockSend && hasError;
-    const summary = L.t('warningBarSummary', { total: hits.length, errors, warns });
+    const summary = L.t('warningBarSummary', { total: rules.length, errors, warns });
     const blockedText = blocked ? L.t('warningBlocked') : L.t('warningAllowed');
-    const descList = hits
-      .map((h) => h.desc || h.pattern)
+    const descList = rules
+      .map((rule) => rule.desc || rule.pattern)
       .filter(Boolean)
       .join(', ');
     bar.replaceChildren();
@@ -417,7 +309,7 @@
       return;
     }
     const text = getText(el);
-    currentHits = scanner.scan(text);
+    currentHits = scanText(text, settings.rules);
     if (currentHits.length > 0) {
       applyWarning(el);
       showWarningBar(currentHits);
@@ -429,6 +321,20 @@
   function isMyInput(target) {
     const el = adapter.input();
     return el && (el === target || el.contains(target));
+  }
+
+  function hasBlockingHit() {
+    return currentHits.some((hit) => hit.rule && hit.rule.severity === 'error');
+  }
+
+  function classNameOf(el) {
+    const value = el && el.className;
+    if (typeof value === 'string') return value.toLowerCase();
+    return (value && value.baseVal ? value.baseVal : '').toLowerCase();
+  }
+
+  function elementFromEvent(e) {
+    return e.target && e.target.nodeType === 1 ? e.target : null;
   }
 
   // ---- 事件监听器（只注册一次，运行时读 settings 控制行为） ----
@@ -455,9 +361,9 @@
     'keydown',
     (e) => {
       if (!settings.enabled || !settings.blockSend) return;
+      if (e.isComposing || e.keyCode === 229) return;
       if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.metaKey) return;
-      const hasError = currentHits.some((h) => h.severity === 'error');
-      if (!hasError) return;
+      if (!hasBlockingHit()) return;
       const el = adapter.input();
       if (!el) return;
       if (el === e.target || el.contains(e.target)) {
@@ -474,9 +380,10 @@
     'click',
     (e) => {
       if (!settings.enabled || !settings.blockSend) return;
-      const hasError = currentHits.some((h) => h.severity === 'error');
-      if (!hasError) return;
-      const btn = e.target.closest(
+      if (!hasBlockingHit()) return;
+      const target = elementFromEvent(e);
+      if (!target) return;
+      const btn = target.closest(
         'button, [role="button"], [type="submit"], input[type="submit"], ' +
           'div[aria-label], span[aria-label], a[aria-label], ' +
           '[id*="send"], [id*="submit"]',
@@ -484,7 +391,7 @@
       if (!btn) return;
       const label = (btn.getAttribute('aria-label') || '').toLowerCase();
       const id = (btn.id || '').toLowerCase();
-      const cls = (btn.className || '').toLowerCase();
+      const cls = classNameOf(btn);
       const isSendBtn = /send|发送|提交|submit|回复|reply/.test(label + id + cls);
       if (isSendBtn) {
         e.preventDefault();
@@ -501,9 +408,10 @@
     'click',
     (e) => {
       if (!settings.enabled || !settings.blockSend) return;
-      const hasError = currentHits.some((h) => h.severity === 'error');
-      if (!hasError) return;
-      const svg = e.target.closest('svg');
+      if (!hasBlockingHit()) return;
+      const target = elementFromEvent(e);
+      if (!target) return;
+      const svg = target.closest('svg');
       if (!svg) return;
       const parent = svg.parentElement;
       if (!parent) return;
@@ -512,7 +420,7 @@
         parent.getAttribute('id') ||
         ''
       ).toLowerCase();
-      const cls = (parent.className || '').toLowerCase();
+      const cls = classNameOf(parent);
       if (/send|发送|提交|submit/.test(label + cls)) {
         e.preventDefault();
         e.stopPropagation();
@@ -528,8 +436,7 @@
     'submit',
     (e) => {
       if (!settings.enabled || !settings.blockSend) return;
-      const hasError = currentHits.some((h) => h.severity === 'error');
-      if (!hasError) return;
+      if (!hasBlockingHit()) return;
       const inputEl = adapter.input();
       if (!inputEl) return;
       const form = e.target;

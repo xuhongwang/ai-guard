@@ -26,14 +26,20 @@ const L = (() => {
     return MESSAGES[lang] || MESSAGES.en;
   }
 
+  function normalizeLang(lang) {
+    const value = String(lang || '')
+      .toLowerCase()
+      .replace(/_/g, '-');
+    return value === 'zh' || value.startsWith('zh-') ? 'zh_CN' : 'en';
+  }
+
   async function init() {
     try {
       const stored = await chrome.storage.local.get(STORAGE_KEY);
-      _lang = stored[STORAGE_KEY] || navigator.language || 'en';
+      _lang = normalizeLang(stored[STORAGE_KEY] || navigator.language);
     } catch {
-      _lang = navigator.language || 'en';
+      _lang = normalizeLang(navigator.language);
     }
-    if (_lang !== 'en' && _lang !== 'zh_CN') _lang = 'en';
     _messages = loadMessages(_lang);
     applyToDOM(document);
     watchDOM(document);
@@ -60,7 +66,7 @@ const L = (() => {
       root.querySelectorAll('[data-i18n-html]').forEach((el) => {
         const key = el.getAttribute('data-i18n-html');
         if (key && key in _messages) {
-          el.textContent = _messages[key];
+          el.innerHTML = _messages[key];
         }
       });
       root.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
@@ -100,5 +106,5 @@ const L = (() => {
     return _lang;
   }
 
-  return { init, t, applyToDOM, watchDOM, getLang, toggleLang };
+  return { init, t, applyToDOM, watchDOM, getLang, toggleLang, normalizeLang };
 })();

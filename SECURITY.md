@@ -31,7 +31,7 @@ AI Guard 的设计约束：
 - 无网络请求、无遥测、无远程配置、无远程规则更新
 - 无远程代码、无 `eval` / `new Function`
 - 配置与语言偏好仅保存在 `chrome.storage.local`
-- 权限仅 `storage` 与 `tabs`
+- 权限仅 `storage`
 
 以下不属于本项目漏洞：
 

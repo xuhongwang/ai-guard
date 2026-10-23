@@ -34,7 +34,15 @@ export default [
     },
   },
   {
-    files: ['src/content/content-script.js', 'src/ui/options.js', 'src/ui/popup.js'],
+    files: ['src/content/content-script.js'],
+    languageOptions: {
+      globals: {
+        L: 'readonly',
+      },
+    },
+  },
+  {
+    files: ['src/ui/options.js', 'src/ui/popup.js'],
     languageOptions: {
       globals: {
         L: 'readonly',

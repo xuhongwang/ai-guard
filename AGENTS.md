@@ -33,7 +33,7 @@ npm ci
 
 - 2 空格缩进、单引号、分号、LF；提交前运行 `npm run format`
 - 扩展代码不得使用 Node API、`eval`、动态远程脚本或 `new Function`
-- 保持 Chrome MV3 与 Firefox MV3 双兼容；Firefox 中 `chrome.*.sendMessage()` 可能返回 `undefined`，不要直接 `.catch()`
+- 保持 Chrome MV3 与 Firefox MV3 双兼容；配置更新统一使用 `storage.onChanged`，不要新增广播通道
 - 新增跨脚本共享能力时，优先沿用 `window.__AI_GUARD_DEFAULTS__` 模式，并在 ESLint `globals` 中显式声明；不要制造新的隐式全局
 - UI 文案不得硬编码：只修改 `_locales/en/messages.json` 与 `_locales/zh_CN/messages.json`，`lang.js` 由 `npm run gen:i18n` 生成，勿手改
 - 不新增权限，除非 PR 中说明必要性、隐私影响与商店审核理由

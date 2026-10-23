@@ -21,33 +21,33 @@
 
 ### 2.1 i18n 正确性
 
-- `data-i18n-html` 使用 `innerHTML`，或移除该属性并统一为纯文本
-- 语言检测支持 `zh-CN`、`zh-TW`、`zh-Hans` 等，统一映射到 `zh_CN`
-- 删除重复的 `defaults.js` / `lang.js` 文案表，改为生成物
+- [x] `data-i18n-html` 使用 `innerHTML`，或移除该属性并统一为纯文本
+- [x] 语言检测支持 `zh-CN`、`zh-TW`、`zh-Hans` 等，统一映射到 `zh_CN`
+- [x] 删除重复的 `defaults.js` / `lang.js` 文案表，改为生成物
 
 验收：中英文切换、带标签文案、浏览器语言首次安装均正确；文案键一致性测试通过。
 
 ### 2.2 配置单一来源与同步
 
-- 删除 `background.js` 中重复的默认规则，改为引用共享模块
-- 配置更新只保留一条主路径（`storage.onChanged`），移除重复广播
-- 导入配置增加结构校验（字段类型、规则类型、正则合法性）
+- [x] 删除 `background.js` 中重复的默认规则，改为引用共享模块
+- [x] 配置更新只保留一条主路径（`storage.onChanged`），移除重复广播
+- [ ] 导入配置增加结构校验（字段类型、规则类型、正则合法性）
 
 验收：首次安装、旧配置迁移、导入非法 JSON、跨标签同步均有测试或手动用例。
 
 ### 2.3 Firefox 兼容
 
-- 所有 `chrome.*.sendMessage()` 调用先判断返回值或使用 `try/catch`
-- 在 Firefox 109+ 验证弹窗、配置页、内容脚本广播
+- [x] 所有 `chrome.*.sendMessage()` 调用先判断返回值或使用 `try/catch`（配置广播已移除）
+- [ ] 在 Firefox 109+ 验证弹窗、配置页、内容脚本同步
 
 验收：Firefox 控制台无 `undefined.catch` 类异常。
 
 ### 2.4 输入体验
 
-- Enter 拦截检查 `isComposing` 与 `keyCode === 229`
-- 发送按钮判断兼容 SVG（`className.baseVal` / `getAttribute('class')`）
-- 输入框变化从 1.5s 轮询改为 `MutationObserver` + `focusin` + 路由事件兜底
-- 正则按规则缓存，规则变更时失效
+- [x] Enter 拦截检查 `isComposing` 与 `keyCode === 229`
+- [x] 发送按钮判断兼容 SVG（`className.baseVal` / `getAttribute('class')`）
+- [ ] 输入框变化从 1.5s 轮询改为 `MutationObserver` + `focusin` + 路由事件兜底
+- [ ] 正则按规则缓存，规则变更时失效
 
 验收：中文输入法选词回车不误拦截；SPA 站点切换会话后检测仍生效；长文本扫描无明显卡顿。
 

@@ -211,10 +211,10 @@ function scanText(text, rules) {
   return hits;
 }
 
-// 挂载到 window：当本文件作为 content script 注入时，供 content-script.js 复用同一份 DEFAULT_RULES，
-// 避免"测试面板"与"真实拦截"规则分叉。options.html 直引时也兼容（window 已存在即可）。
+// 挂载到全局：content script / options 使用 window，Chrome service worker 使用 globalThis。
+// background.js 通过 importScripts 复用同一份默认值，避免规则分叉。
 try {
-  window.__AI_GUARD_DEFAULTS__ = {
+  (typeof window !== 'undefined' ? window : globalThis).__AI_GUARD_DEFAULTS__ = {
     DEFAULT_RULES,
     DEFAULT_SITES,
     DEFAULT_SETTINGS,
