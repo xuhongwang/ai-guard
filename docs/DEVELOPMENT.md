@@ -87,9 +87,9 @@ Firefox 使用 `manifests/firefox.json` 生成自己的清单（包含 `browser_
 
 不要直接编辑 `src/generated/lang.js`。修改 `_locales/{en,zh_CN}/messages.json` 后运行 `npm run gen:i18n`，或直接运行 `npm run build`。
 
-### Firefox 下消息发送报错
+### 配置更新如何生效
 
-Firefox 中 `chrome.tabs.sendMessage()` / `chrome.runtime.sendMessage()` 可能返回 `undefined`，不能直接调用 `.catch()`。使用 `try/catch` 或先判断返回值。
+配置写入 `chrome.storage.local` 后，内容脚本通过 `storage.onChanged` 重新加载并重新扫描，不需要手动广播消息。
 
 ### 正则规则无效
 
@@ -97,7 +97,7 @@ Firefox 中 `chrome.tabs.sendMessage()` / `chrome.runtime.sendMessage()` 可能�
 
 ### 配置不同步
 
-配置通过 `chrome.storage.local` 持久化，并由 background 广播到已打开标签页。若目标标签页是在扩展安装前打开的，刷新页面即可。
+配置通过 `chrome.storage.local` 持久化，内容脚本监听 `storage.onChanged` 自动更新。若目标标签页是在扩展安装前打开的，刷新页面即可。
 
 ### CSP 报错
 
@@ -107,7 +107,7 @@ Firefox 中 `chrome.tabs.sendMessage()` / `chrome.runtime.sendMessage()` 可能�
 
 - `src/core/defaults.js`：默认规则、默认站点、`normalizeText`、`scanText`
 - `src/content/content-script.js`：站点适配、输入监听、发送拦截、警告 UI
-- `src/background/background.js`：首次安装初始化、旧配置迁移、配置广播
+- `src/background/background.js`：首次安装初始化与旧配置迁移
 - `src/ui/lang.template.js`：i18n 逻辑模板，构建时注入 `_locales` 文案
 - `src/ui/options.*` / `src/ui/popup.*`：配置页与弹窗
 - `manifests/`：共享清单与浏览器差异

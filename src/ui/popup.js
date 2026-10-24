@@ -18,15 +18,8 @@ function loadSettings(cb) {
 
 function saveSettings(s, cb) {
   chrome.storage.local.set({ settings: s }, () => {
-    notifyContentScripts();
     cb && cb();
   });
-}
-
-function notifyContentScripts() {
-  try {
-    chrome.runtime.sendMessage({ type: 'AI_GUARD_CONFIG_UPDATED' }).catch(() => {});
-  } catch (e) {}
 }
 
 function updateSubToggles(enabled) {

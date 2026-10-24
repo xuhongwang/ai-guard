@@ -26,6 +26,14 @@ test('defaults are exposed on window', () => {
   assert.equal(typeof scanText, 'function');
 });
 
+test('defaults mount to globalThis when window is absent', () => {
+  const worker = {};
+  vm.createContext(worker);
+  vm.runInContext(source, worker, { filename: 'defaults.js' });
+  assert.equal(typeof worker.__AI_GUARD_DEFAULTS__.scanText, 'function');
+  assert.ok(Array.isArray(worker.__AI_GUARD_DEFAULTS__.DEFAULT_RULES));
+});
+
 test('normalizeText removes zero-width characters and converts full-width characters', () => {
   assert.equal(normalizeText('a\u200Bb\uFEFFc\u00ADd'), 'abcd');
   assert.equal(normalizeText('ＡＢＣ１２３'), 'ABC123');

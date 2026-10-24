@@ -24,12 +24,18 @@
 - 扩展开发改为先构建，再加载 `dist/chrome` / `dist/firefox`
 - 删除 `defaults.js` 中重复的 i18n 表，文案只维护 `_locales`
 - 清理 `_locales` 中未使用的规则描述键，并同步运行时文案
+- `background.js` 与内容脚本复用 `defaults.js`，删除重复默认规则与扫描器
+- 配置更新统一由 `storage.onChanged` 处理，移除广播与 `tabs` 权限
 
 ### Fixed
 
 - SPA 站内跳转后旧警告条不消失
 - 警告条悬停时无法在顶部 / 底部之间切换
 - `npm test` 在 Node 22 下无法定位测试目录
+- `data-i18n-html` 文案显示标签字面量
+- `zh-CN`、`zh-TW` 等语言未映射到中文界面
+- 中文输入法选词回车被误拦截
+- SVG 发送按钮的 `className` 判断抛错
 
 ## [1.0.0] - 2026-09-04
 

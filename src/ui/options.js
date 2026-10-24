@@ -16,16 +16,9 @@ function load(cb) {
 
 function save(s, cb) {
   chrome.storage.local.set({ [STORAGE_KEY]: s }, () => {
-    notifyContentScripts();
     cb && cb();
     showToast(L.t('toastSaved'));
   });
-}
-
-function notifyContentScripts() {
-  try {
-    chrome.runtime.sendMessage({ type: 'AI_GUARD_CONFIG_UPDATED' }).catch(() => {});
-  } catch (e) {}
 }
 
 function showToast(msg) {

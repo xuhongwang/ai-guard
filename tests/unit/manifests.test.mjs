@@ -41,8 +41,7 @@ test('generated manifests are MV3 with package version', () => {
 
 test('permissions and content scripts are consistent', () => {
   for (const [name, manifest] of Object.entries(manifests)) {
-    assert.ok(manifest.permissions.includes('storage'), `${name}: storage permission`);
-    assert.ok(manifest.permissions.includes('tabs'), `${name}: tabs permission`);
+    assert.deepEqual(manifest.permissions, ['storage'], `${name}: permissions`);
 
     const contentScript = manifest.content_scripts[0];
     assert.deepEqual(
@@ -58,10 +57,16 @@ test('permissions and content scripts are consistent', () => {
 test('browser-specific background declarations are present', () => {
   assert.equal(manifests.chrome.background.service_worker, 'background.js');
   assert.equal(manifests.chrome.background.scripts, undefined);
-  assert.deepEqual(manifests.firefox.background.scripts, ['background.js']);
+  assert.deepEqual(manifests.firefox.background.scripts, ['defaults.js', 'background.js']);
   assert.equal(manifests.firefox.background.service_worker, undefined);
   assert.equal(manifests.firefox.browser_specific_settings.gecko.id, 'ai-guard@extension.local');
   assert.equal(manifests.chrome.browser_specific_settings, undefined);
+});
+
+test('background reuses the shared defaults', () => {
+  const background = readFileSync(path.join(root, 'src', 'background', 'background.js'), 'utf8');
+  assert.match(background, /importScripts\('defaults\.js'\)/);
+  assert.ok(!background.includes('const DEFAULT_RULES'), 'background must not duplicate rules');
 });
 
 test('generated manifests only contain expected fields', () => {

@@ -3,7 +3,7 @@
   "name": "AI Guard",
   "default_locale": "en",
   "description": "__MSG_extDesc__",
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

@@ -31,7 +31,7 @@ npm_config_cache=../.npm-cache npm ci
 
 - 运行 `npm run format`，保持 LF、2 空格、单引号、分号
 - 扩展代码运行在浏览器中，禁止使用 Node API、`eval`、`new Function` 或远程脚本
-- 保持 Chrome MV3 与 Firefox MV3 双兼容；注意 Firefox 中 `chrome.*.sendMessage()` 可能返回 `undefined`
+- 保持 Chrome MV3 与 Firefox MV3 双兼容；配置更新统一使用 `storage.onChanged`，不要新增广播通道
 - 不新增运行时依赖；新增开发依赖需在 PR 中说明必要性
 - 新增权限需说明用途、隐私影响与商店审核理由
 
