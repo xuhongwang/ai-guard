@@ -23,6 +23,7 @@ test('build produces loadable Chrome and Firefox packages', async () => {
 
       for (const file of [
         'defaults.js',
+        'settings.js',
         'background.js',
         'content-script.js',
         'content-style.css',

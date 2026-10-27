@@ -215,6 +215,22 @@
     "message": "格式错误：缺少 rules 数组",
     "description": "Import format error"
   },
+  "importInvalidSettings": {
+    "message": "格式错误：配置文件无效",
+    "description": "Invalid settings file"
+  },
+  "importInvalidRule": {
+    "message": "第 {index} 条规则无效",
+    "description": "Invalid imported rule"
+  },
+  "importInvalidRegex": {
+    "message": "第 {index} 条规则的正则无效",
+    "description": "Invalid imported regex"
+  },
+  "importInvalidSite": {
+    "message": "第 {index} 个站点无效",
+    "description": "Invalid imported site"
+  },
   "warningBarTitle": {
     "message": "AI Guard：",
     "description": "Warning bar title prefix"

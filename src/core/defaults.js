@@ -120,6 +120,23 @@ function normalizeText(text) {
     .replace(/\u3000/g, ' ');
 }
 
+const REGEX_CACHE = new Map();
+const REGEX_CACHE_LIMIT = 200;
+
+function compileRegex(pattern) {
+  const key = String(pattern);
+  if (REGEX_CACHE.has(key)) return REGEX_CACHE.get(key);
+  let re;
+  try {
+    re = new RegExp(key, 'g');
+  } catch {
+    re = null;
+  }
+  if (REGEX_CACHE.size >= REGEX_CACHE_LIMIT) REGEX_CACHE.clear();
+  REGEX_CACHE.set(key, re);
+  return re;
+}
+
 /**
  * 纯函数：对一段文本跑规则，返回命中列表。
  * 内部先归一化文本再匹配（抗变形），返回的 match 和 index 对应原始文本。
@@ -134,7 +151,9 @@ function scanText(text, rules) {
       if (!rule || !rule.enabled) continue;
       try {
         if (rule.type === 'regex') {
-          const re = new RegExp(rule.pattern, 'g');
+          const re = compileRegex(rule.pattern);
+          if (!re) continue;
+          re.lastIndex = 0;
           let m;
           while ((m = re.exec(text)) !== null) {
             hits.push({ rule, match: m[0], index: m.index });
@@ -176,7 +195,9 @@ function scanText(text, rules) {
     if (!rule || !rule.enabled) continue;
     try {
       if (rule.type === 'regex') {
-        const re = new RegExp(rule.pattern, 'g');
+        const re = compileRegex(rule.pattern);
+        if (!re) continue;
+        re.lastIndex = 0;
         let m;
         while ((m = re.exec(normalized)) !== null) {
           const nStart = m.index;

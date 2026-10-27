@@ -69,6 +69,12 @@ test('invalid regex patterns are skipped without throwing', () => {
   assert.equal(scanText('anything', [rule({ type: 'regex', pattern: '[' })]).length, 0);
 });
 
+test('regex rules remain stateless across repeated scans', () => {
+  const regexRule = rule({ type: 'regex', pattern: 'secret' });
+  assert.equal(scanText('secret and secret', [regexRule]).length, 2);
+  assert.equal(scanText('secret and secret', [regexRule]).length, 2);
+});
+
 test('full-width and zero-width bypasses still match the original text', () => {
   const fullWidth = scanText('ｓｅｃｒｅｔ', [rule()]);
   assert.equal(fullWidth.length, 1);

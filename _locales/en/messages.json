@@ -215,6 +215,22 @@
     "message": "Format error: missing rules array",
     "description": "Import format error"
   },
+  "importInvalidSettings": {
+    "message": "Format error: invalid settings file",
+    "description": "Invalid settings file"
+  },
+  "importInvalidRule": {
+    "message": "Invalid rule at #{index}",
+    "description": "Invalid imported rule"
+  },
+  "importInvalidRegex": {
+    "message": "Invalid regex in rule #{index}",
+    "description": "Invalid imported regex"
+  },
+  "importInvalidSite": {
+    "message": "Invalid site at #{index}",
+    "description": "Invalid imported site"
+  },
   "warningBarTitle": {
     "message": "AI Guard:",
     "description": "Warning bar title prefix"

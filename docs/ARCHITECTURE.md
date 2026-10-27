@@ -12,6 +12,7 @@
 | 路径                           | 职责                                             |
 | ------------------------------ | ------------------------------------------------ |
 | `src/core/defaults.js`         | 默认规则 / 站点、`normalizeText()`、`scanText()` |
+| `src/core/settings.js`         | 导入配置的字段、规则、正则与站点校验             |
 | `src/background/background.js` | 首次安装初始化、`sync` → `local` 迁移            |
 | `src/content/`                 | 内容脚本、站点适配、输入监听、拦截、高亮与警告条 |
 | `src/ui/lang.template.js`      | i18n 运行时逻辑，构建时注入文案                  |
@@ -49,7 +50,7 @@ src/**、_locales/、icons/、privacy.html、LICENSE
 
 内容脚本按以下顺序注入：`defaults.js` → `lang.js` → `content-script.js`，运行时机为 `document_idle`，匹配 `<all_urls>`。脚本之间通过全局变量协作，`defaults.js` 把 API 挂到 `window.__AI_GUARD_DEFAULTS__`。
 
-Chrome service worker 通过 `importScripts('defaults.js')` 复用默认值；Firefox 的 `background.scripts` 先加载 `defaults.js`，再加载 `background.js`。配置页与弹窗同样加载 `defaults.js` 与生成的 `lang.js`，因此所有入口共用同一份默认值与文案。
+Chrome service worker 通过 `importScripts('defaults.js')` 复用默认值；Firefox 的 `background.scripts` 先加载 `defaults.js`，再加载 `background.js`。配置页与弹窗同样加载 `defaults.js` 与生成的 `lang.js`，因此所有入口共用同一份默认值与文案；配置页额外加载 `settings.js` 做导入校验。
 
 ## 数据流
 
@@ -107,10 +108,7 @@ Chrome service worker 通过 `importScripts('defaults.js')` 复用默认值；Fi
 
 以下问题已在规划中，修复前请勿在文档或 PR 中声称已解决：
 
-- 内容脚本每 1.5s 轮询检查输入框，开销偏高
-- 每次扫描重新编译正则，长文本下成本较高
-- 配置页每次按键即保存并弹出提示，写入与提示过于频繁
-- 导入 JSON 缺少结构校验
+- 删除规则 / 站点暂无撤销或二次确认
 
 后续修复计划见 [ROADMAP.md](ROADMAP.md)。
 

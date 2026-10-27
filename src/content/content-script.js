@@ -140,7 +140,8 @@
 
   // ---- context validity check ----
   let _dead = false;
-  let _pollId = null;
+  let _observer = null;
+  let _recheckTimer = null;
   function isContextValid() {
     if (_dead) return false;
     try {
@@ -148,9 +149,13 @@
       return true;
     } catch {
       _dead = true;
-      if (_pollId) {
-        clearInterval(_pollId);
-        _pollId = null;
+      if (_observer) {
+        _observer.disconnect();
+        _observer = null;
+      }
+      if (_recheckTimer) {
+        clearTimeout(_recheckTimer);
+        _recheckTimer = null;
       }
       return false;
     }
@@ -160,6 +165,8 @@
   let settings = Object.assign({}, DEFAULT_SETTINGS);
   let adapter = buildAdapter(settings.sites);
   let currentHits = [];
+  let _lastScannedInput = null;
+  let _lastScannedText = null;
 
   // ---- 统一配置应用 ----
   function applyConfig(cfg) {
@@ -168,7 +175,7 @@
     if (!settings.sites) settings.sites = { builtin: true, custom: [] };
     adapter = buildAdapter(settings.sites);
     clearWarning();
-    recheck();
+    recheck(true);
   }
 
   // ---- 从 storage 加载配置 ----
@@ -201,7 +208,7 @@
           if (changes.ai_guard_lang) {
             L.init().then(() => {
               clearWarning();
-              recheck();
+              recheck(true);
             });
           }
         }
@@ -293,10 +300,20 @@
     bar.appendChild(detail);
   }
 
-  function recheck() {
+  function scheduleRecheck(delay = 150) {
+    if (_recheckTimer) clearTimeout(_recheckTimer);
+    _recheckTimer = setTimeout(() => {
+      _recheckTimer = null;
+      recheck();
+    }, delay);
+  }
+
+  function recheck(force = false) {
     if (!isContextValid()) return;
     if (!settings.enabled) {
       currentHits = [];
+      _lastScannedInput = null;
+      _lastScannedText = null;
       clearWarning();
       return;
     }
@@ -305,10 +322,23 @@
     if (!el) {
       // 当前页面没有可用的输入框（页面跳转 / 编辑器卸载）时清理残留警告
       currentHits = [];
+      _lastScannedInput = null;
+      _lastScannedText = null;
       clearWarning();
       return;
     }
     const text = getText(el);
+    if (!force && el === _lastScannedInput && text === _lastScannedText) {
+      if (
+        currentHits.length === 0 ||
+        !settings.visualWarning ||
+        document.getElementById('__ai-guard-bar')
+      ) {
+        return;
+      }
+    }
+    _lastScannedInput = el;
+    _lastScannedText = text;
     currentHits = scanText(text, settings.rules);
     if (currentHits.length > 0) {
       applyWarning(el);
@@ -481,21 +511,48 @@
     if (location.href === _lastUrl) return false;
     _lastUrl = location.href;
     currentHits = [];
+    _lastScannedInput = null;
+    _lastScannedText = null;
     clearWarning();
     // 等待新页面 DOM 渲染后再检测，避免扫到跳转前的旧编辑器
-    setTimeout(recheck, 200);
+    scheduleRecheck(200);
     return true;
   }
   window.addEventListener('popstate', onNavigate);
   window.addEventListener('hashchange', onNavigate);
+  window.addEventListener('pageshow', onNavigate);
+
+  function startWatching() {
+    if (_observer) return;
+    _observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        const target = mutation.target;
+        if (
+          target &&
+          target.nodeType === 1 &&
+          target.closest('#__ai-guard-bar, #__ai-guard-toast')
+        ) {
+          continue;
+        }
+        scheduleRecheck();
+        return;
+      }
+    });
+    _observer.observe(document.documentElement, { childList: true, subtree: true });
+    document.addEventListener('focusin', () => scheduleRecheck(0), true);
+    document.addEventListener(
+      'visibilitychange',
+      () => {
+        if (!document.hidden) scheduleRecheck(0);
+      },
+      true,
+    );
+  }
 
   L.init().then(() => {
     loadSettings(() => {
-      recheck();
-      setTimeout(recheck, 500);
-      _pollId = setInterval(() => {
-        if (!onNavigate()) recheck();
-      }, 1500);
+      startWatching();
+      recheck(true);
     });
   });
 })();
