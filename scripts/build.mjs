@@ -9,6 +9,7 @@ const TARGETS = ['chrome', 'firefox'];
 
 const COPY = [
   ['src/core/defaults.js', 'defaults.js'],
+  ['src/core/settings.js', 'settings.js'],
   ['src/background/background.js', 'background.js'],
   ['src/content/content-script.js', 'content-script.js'],
   ['src/content/content-style.css', 'content-style.css'],

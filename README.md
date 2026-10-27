@@ -85,6 +85,7 @@ npm run verify   # lint + format:check + test + build
 ai-guard/
 ├── src/
 │   ├── core/defaults.js            # 默认规则 / 站点 / 归一化 / 扫描实现
+│   ├── core/settings.js            # 导入配置校验
 │   ├── background/background.js    # Service worker：初始化与旧配置迁移
 │   ├── content/                    # 注入网页：扫描、适配、拦截与警告 UI
 │   └── ui/                         # 配置页、弹窗、i18n 模板

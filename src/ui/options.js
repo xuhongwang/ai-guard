@@ -4,31 +4,83 @@ function getDefaults() {
   return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
 }
 
-function load(cb) {
-  chrome.storage.local.get([STORAGE_KEY], (res) => {
-    const merged = Object.assign(getDefaults(), res.settings || {});
-    if (!Array.isArray(merged.rules)) merged.rules = getDefaults().rules;
-    if (!merged.sites) merged.sites = getDefaults().sites;
-    if (!Array.isArray(merged.sites.custom)) merged.sites.custom = [];
-    cb(merged);
+let saveTimer = null;
+let pendingState = null;
+let pendingCallback = null;
+
+function flushPendingSave(done) {
+  if (!saveTimer) {
+    if (done) done();
+    return;
+  }
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  const state = pendingState;
+  const callback = pendingCallback;
+  pendingState = null;
+  pendingCallback = null;
+  if (!state) {
+    if (done) done();
+    return;
+  }
+  save(state, () => {
+    if (callback) callback();
+    if (done) done();
   });
 }
 
 function save(s, cb) {
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  pendingState = null;
+  pendingCallback = null;
   chrome.storage.local.set({ [STORAGE_KEY]: s }, () => {
     cb && cb();
     showToast(L.t('toastSaved'));
   });
 }
 
+function scheduleSave(s, cb) {
+  pendingState = s;
+  pendingCallback = cb || null;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    const state = pendingState;
+    const callback = pendingCallback;
+    pendingState = null;
+    pendingCallback = null;
+    if (state) save(state, callback);
+  }, 350);
+}
+
+function load(cb) {
+  flushPendingSave(() => {
+    chrome.storage.local.get([STORAGE_KEY], (res) => {
+      const merged = Object.assign(getDefaults(), res.settings || {});
+      if (!Array.isArray(merged.rules)) merged.rules = getDefaults().rules;
+      if (!merged.sites) merged.sites = getDefaults().sites;
+      if (!Array.isArray(merged.sites.custom)) merged.sites.custom = [];
+      cb(merged);
+    });
+  });
+}
+
+let toastTimer = null;
 function showToast(msg) {
   const old = document.querySelector('.toast');
-  if (old) old.remove();
+  if (old) {
+    old.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => old.remove(), 2100);
+    return;
+  }
   const t = document.createElement('div');
   t.className = 'toast';
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2100);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.remove(), 2100);
 }
 
 // =================== 规则列表渲染 ===================
@@ -72,9 +124,10 @@ function render(state) {
     inpPat.placeholder = L.t('placeholderPattern');
     inpPat.addEventListener('input', () => {
       rule.pattern = inpPat.value;
-      save(state);
+      scheduleSave(state);
       renderTest();
     });
+    inpPat.addEventListener('change', () => flushPendingSave());
     tdPat.appendChild(inpPat);
 
     const tdDesc = document.createElement('td');
@@ -84,8 +137,9 @@ function render(state) {
     inpDesc.placeholder = L.t('placeholderDesc');
     inpDesc.addEventListener('input', () => {
       rule.desc = inpDesc.value;
-      save(state);
+      scheduleSave(state);
     });
+    inpDesc.addEventListener('change', () => flushPendingSave());
     tdDesc.appendChild(inpDesc);
 
     const tdSev = document.createElement('td');
@@ -153,8 +207,9 @@ function renderSites(state) {
       inp.placeholder = placeholder;
       inp.addEventListener('input', () => {
         site[field] = inp.value;
-        save(state);
+        scheduleSave(state);
       });
+      inp.addEventListener('change', () => flushPendingSave());
       return inp;
     };
     const tdHost = document.createElement('td');
@@ -292,27 +347,42 @@ document.getElementById('btnImport').addEventListener('click', () => {
   document.getElementById('fileInput').click();
 });
 
+function importErrorMessage(error) {
+  const code = error && error.message ? String(error.message) : '';
+  if (code === 'rules') return L.t('importFormatError');
+  if (code.startsWith('rule:'))
+    return L.t('importInvalidRule', { index: Number(code.slice(5)) + 1 });
+  if (code.startsWith('regex:'))
+    return L.t('importInvalidRegex', { index: Number(code.slice(6)) + 1 });
+  if (code.startsWith('site:'))
+    return L.t('importInvalidSite', { index: Number(code.slice(5)) + 1 });
+  return L.t('importInvalidSettings');
+}
+
 document.getElementById('fileInput').addEventListener('change', (e) => {
-  const file = e.target.files[0];
+  const input = e.target;
+  const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
     try {
-      const data = JSON.parse(reader.result);
-      if (!Array.isArray(data.rules)) throw new Error(L.t('importFormatError'));
-      load(() => {
-        const fresh = getDefaults();
-        const merged = Object.assign(fresh, data, { rules: data.rules });
-        if (data.sites) merged.sites = data.sites;
-        lastState = merged;
-        save(merged, () => {
-          render(merged);
-          renderTest();
-        });
+      const api = window.__AI_GUARD_SETTINGS__;
+      if (!api) throw new Error('format');
+      const merged = api.normalizeSettings(JSON.parse(reader.result), getDefaults());
+      lastState = merged;
+      save(merged, () => {
+        render(merged);
+        renderTest();
       });
     } catch (err) {
-      alert(L.t('importError', { error: err.message }));
+      alert(L.t('importError', { error: importErrorMessage(err) }));
+    } finally {
+      input.value = '';
     }
+  };
+  reader.onerror = () => {
+    alert(L.t('importError', { error: L.t('importInvalidSettings') }));
+    input.value = '';
   };
   reader.readAsText(file);
 });
@@ -363,6 +433,8 @@ document.getElementById('btnClearTest').addEventListener('click', () => {
   document.getElementById('testInput').value = '';
   renderTest();
 });
+
+window.addEventListener('beforeunload', () => flushPendingSave());
 
 // =================== i18n 初始化 ===================
 async function initI18n() {

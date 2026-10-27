@@ -14,6 +14,7 @@
 - copy-only 构建：`src/` + `manifests/` → `dist/chrome`、`dist/firefox`
 - `_locales` → `src/generated/lang.js` 文案生成
 - 清单生成与 `package.json` 单一版本来源
+- 导入配置结构校验：字段类型、规则类型、正则与站点
 
 ### Changed
 
@@ -26,6 +27,9 @@
 - 清理 `_locales` 中未使用的规则描述键，并同步运行时文案
 - `background.js` 与内容脚本复用 `defaults.js`，删除重复默认规则与扫描器
 - 配置更新统一由 `storage.onChanged` 处理，移除广播与 `tabs` 权限
+- 输入框变化改用 `MutationObserver` + `focusin` + 路由事件，移除 1.5s 轮询
+- 正则按 pattern 缓存，避免每次扫描重新编译
+- 配置页文本输入保存防抖 350ms，并合并重复的保存提示
 
 ### Fixed
 
