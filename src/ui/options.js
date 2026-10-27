@@ -29,14 +29,14 @@ function flushPendingSave(done) {
   });
 }
 
-function save(s, cb) {
+function save(s, cb, options) {
   clearTimeout(saveTimer);
   saveTimer = null;
   pendingState = null;
   pendingCallback = null;
   chrome.storage.local.set({ [STORAGE_KEY]: s }, () => {
     cb && cb();
-    showToast(L.t('toastSaved'));
+    if (!options || !options.silent) showToast(L.t('toastSaved'));
   });
 }
 
@@ -66,21 +66,59 @@ function load(cb) {
   });
 }
 
+// 撤销删除：重新读取最新配置后把条目放回原位置
+function restoreItem(kind, item, nextId) {
+  load((fresh) => {
+    const api = window.__AI_GUARD_SETTINGS__;
+    const list = kind === 'rules' ? fresh.rules : fresh.sites.custom;
+    const restored = api ? api.restoreRemoved(list, item, nextId) : list.concat([item]);
+    if (kind === 'rules') fresh.rules = restored;
+    else fresh.sites.custom = restored;
+    lastState = fresh;
+    save(fresh, () => {
+      render(fresh);
+      renderTest();
+    });
+  });
+}
+
 let toastTimer = null;
-function showToast(msg) {
-  const old = document.querySelector('.toast');
-  if (old) {
-    old.textContent = msg;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => old.remove(), 2100);
-    return;
-  }
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
+
+function hideToast() {
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.remove(), 2100);
+  toastTimer = null;
+  const el = document.querySelector('.toast');
+  if (el) el.remove();
+}
+
+function showToast(msg, action) {
+  let el = document.querySelector('.toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'toast';
+    document.body.appendChild(el);
+  }
+  el.classList.toggle('toast-undo', !!action);
+  el.replaceChildren();
+
+  const text = document.createElement('span');
+  text.textContent = msg;
+  el.appendChild(text);
+
+  if (action) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toast-action';
+    btn.textContent = action.label;
+    btn.addEventListener('click', () => {
+      hideToast();
+      action.onClick();
+    });
+    el.appendChild(btn);
+  }
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, action ? 6000 : 2100);
 }
 
 // =================== 规则列表渲染 ===================
@@ -163,11 +201,20 @@ function render(state) {
     btnDel.className = 'del';
     btnDel.textContent = L.t('btnDelete');
     btnDel.addEventListener('click', () => {
+      const removed = state.rules[idx];
+      const nextId = state.rules[idx + 1] ? state.rules[idx + 1].id : null;
       state.rules.splice(idx, 1);
-      save(state, () => {
-        render(state);
-        renderSites(state);
-        renderTest();
+      save(
+        state,
+        () => {
+          render(state);
+          renderTest();
+        },
+        { silent: true },
+      );
+      showToast(L.t('toastRuleDeleted'), {
+        label: L.t('btnUndo'),
+        onClick: () => restoreItem('rules', removed, nextId),
       });
     });
     tdDel.appendChild(btnDel);
@@ -224,8 +271,14 @@ function renderSites(state) {
     btnDel.className = 'del';
     btnDel.textContent = L.t('btnDelete');
     btnDel.addEventListener('click', () => {
+      const removed = state.sites.custom[idx];
+      const nextId = state.sites.custom[idx + 1] ? state.sites.custom[idx + 1].id : null;
       state.sites.custom.splice(idx, 1);
-      save(state, () => renderSites(state));
+      save(state, () => renderSites(state), { silent: true });
+      showToast(L.t('toastSiteDeleted'), {
+        label: L.t('btnUndo'),
+        onClick: () => restoreItem('sites', removed, nextId),
+      });
     });
     tdDel.appendChild(btnDel);
 

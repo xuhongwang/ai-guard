@@ -92,9 +92,27 @@
     return result;
   }
 
+  /**
+   * 把被删除的条目放回原位置：优先插到原来后一个条目之前，
+   * 找不到锚点或缺少 id 时追加到末尾。已存在同 id 条目不重复插入。
+   */
+  function restoreRemoved(items, item, nextId) {
+    const list = Array.isArray(items) ? items.slice() : [];
+    if (!item || typeof item !== 'object') return list;
+    const id = typeof item.id === 'string' ? item.id : '';
+    if (id && list.some((entry) => entry && entry.id === id)) return list;
+    let at = -1;
+    if (nextId) {
+      at = list.findIndex((entry) => entry && entry.id === nextId);
+    }
+    list.splice(at === -1 ? list.length : at, 0, item);
+    return list;
+  }
+
   try {
     (typeof window !== 'undefined' ? window : globalThis).__AI_GUARD_SETTINGS__ = {
       normalizeSettings,
+      restoreRemoved,
     };
   } catch (e) {}
 })();

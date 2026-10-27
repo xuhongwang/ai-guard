@@ -12,7 +12,7 @@
 | 路径                           | 职责                                             |
 | ------------------------------ | ------------------------------------------------ |
 | `src/core/defaults.js`         | 默认规则 / 站点、`normalizeText()`、`scanText()` |
-| `src/core/settings.js`         | 导入配置的字段、规则、正则与站点校验             |
+| `src/core/settings.js`         | 导入校验与删除后的位置恢复                       |
 | `src/background/background.js` | 首次安装初始化、`sync` → `local` 迁移            |
 | `src/content/`                 | 内容脚本、站点适配、输入监听、拦截、高亮与警告条 |
 | `src/ui/lang.template.js`      | i18n 运行时逻辑，构建时注入文案                  |

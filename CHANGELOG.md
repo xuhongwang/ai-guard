@@ -15,6 +15,7 @@
 - `_locales` → `src/generated/lang.js` 文案生成
 - 清单生成与 `package.json` 单一版本来源
 - 导入配置结构校验：字段类型、规则类型、正则与站点
+- 删除规则 / 站点后可在提示中撤销，条目回到原位置
 
 ### Changed
 
