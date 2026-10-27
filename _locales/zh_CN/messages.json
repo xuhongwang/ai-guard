@@ -203,6 +203,18 @@
     "message": "已保存并同步",
     "description": "Toast: save success"
   },
+  "toastRuleDeleted": {
+    "message": "已删除规则",
+    "description": "Toast: rule deleted"
+  },
+  "toastSiteDeleted": {
+    "message": "已删除站点",
+    "description": "Toast: site deleted"
+  },
+  "btnUndo": {
+    "message": "撤销",
+    "description": "Undo button"
+  },
   "confirmReset": {
     "message": "恢复默认内置规则？当前自定义规则将被覆盖。",
     "description": "Confirm reset dialog"

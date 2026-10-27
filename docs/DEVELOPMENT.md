@@ -106,7 +106,7 @@ Firefox 使用 `manifests/firefox.json` 生成自己的清单（包含 `browser_
 ## 目录导航
 
 - `src/core/defaults.js`：默认规则、默认站点、`normalizeText`、`scanText`
-- `src/core/settings.js`：导入配置校验与字段归一化
+- `src/core/settings.js`：导入配置校验、字段归一化与删除撤销恢复
 - `src/content/content-script.js`：站点适配、输入监听、发送拦截、警告 UI
 - `src/background/background.js`：首次安装初始化与旧配置迁移
 - `src/ui/lang.template.js`：i18n 逻辑模板，构建时注入 `_locales` 文案

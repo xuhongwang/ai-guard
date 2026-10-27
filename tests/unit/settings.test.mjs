@@ -7,7 +7,7 @@ const source = readFileSync(new URL('../../src/core/settings.js', import.meta.ur
 const sandbox = { window: {} };
 vm.createContext(sandbox);
 vm.runInContext(source, sandbox, { filename: 'settings.js' });
-const { normalizeSettings } = sandbox.window.__AI_GUARD_SETTINGS__;
+const { normalizeSettings, restoreRemoved } = sandbox.window.__AI_GUARD_SETTINGS__;
 
 const base = {
   enabled: true,
@@ -110,5 +110,47 @@ test('rejects malformed sites', () => {
         base,
       ),
     /site:0/,
+  );
+});
+
+test('restores a removed item before its former successor', () => {
+  const list = [{ id: 'a' }, { id: 'c' }];
+  const restored = restoreRemoved(list, { id: 'b' }, 'c');
+  assert.deepEqual(
+    restored.map((item) => item.id),
+    ['a', 'b', 'c'],
+  );
+  assert.deepEqual(
+    list.map((item) => item.id),
+    ['a', 'c'],
+    'input list must not be mutated',
+  );
+});
+
+test('restores a removed item at the end when the anchor is gone', () => {
+  const restored = restoreRemoved([{ id: 'a' }], { id: 'b' }, 'missing');
+  assert.deepEqual(
+    restored.map((item) => item.id),
+    ['a', 'b'],
+  );
+  assert.deepEqual(
+    restoreRemoved([{ id: 'a' }], { id: 'b' }, null).map((item) => item.id),
+    ['a', 'b'],
+  );
+});
+
+test('restoreRemoved ignores duplicates and invalid input', () => {
+  const list = [{ id: 'a' }, { id: 'b' }];
+  assert.deepEqual(
+    restoreRemoved(list, { id: 'b' }, 'a').map((item) => item.id),
+    ['a', 'b'],
+  );
+  assert.deepEqual(
+    restoreRemoved(list, null, 'a').map((item) => item.id),
+    ['a', 'b'],
+  );
+  assert.deepEqual(
+    [...restoreRemoved(null, { id: 'x' })].map((item) => item.id),
+    ['x'],
   );
 });

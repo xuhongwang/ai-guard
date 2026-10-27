@@ -203,6 +203,18 @@
     "message": "Saved and synced",
     "description": "Toast: save success"
   },
+  "toastRuleDeleted": {
+    "message": "Rule deleted",
+    "description": "Toast: rule deleted"
+  },
+  "toastSiteDeleted": {
+    "message": "Site deleted",
+    "description": "Toast: site deleted"
+  },
+  "btnUndo": {
+    "message": "Undo",
+    "description": "Undo button"
+  },
   "confirmReset": {
     "message": "Reset to default built-in rules? Your custom rules will be overwritten.",
     "description": "Confirm reset dialog"
