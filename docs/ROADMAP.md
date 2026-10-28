@@ -6,7 +6,7 @@
 - [x] 修复 SPA 跳转后残留警告条
 - [x] 警告条悬停切换顶部 / 底部
 
-## Phase 1 — 工程基线（进行中）
+## Phase 1 — 工程基线（已完成）
 
 - [x] ESLint / Prettier / EditorConfig / `.nvmrc`
 - [x] 单元测试（清单、i18n、扫描逻辑）

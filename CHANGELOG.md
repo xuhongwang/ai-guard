@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-28
+
 ### Added
 
 - ESLint、Prettier、EditorConfig 与 Node 版本约束
