@@ -14,10 +14,11 @@ npm run verify    # lint + format:check + test + build
 - `tests/unit/defaults.test.mjs`：归一化（零宽 / 全角）、关键字与正则匹配、非法输入、默认规则结构与代表性密钥检测
 - `tests/unit/lang.test.mjs`：语言变体归一化、`zh-CN` 选择、`data-i18n-html` 渲染
 - `tests/unit/background.test.mjs`：Chrome / Firefox 启动时复用共享默认值并初始化存储
-- `tests/unit/settings.test.mjs`：导入配置的字段、规则、正则与站点校验
+- `tests/unit/settings.test.mjs`：导入配置的字段、规则、正则与站点校验，删除撤销的位置恢复
+- `tests/unit/options.test.mjs`：jsdom 加载配置页，覆盖渲染、开关持久化、删除撤销、非法导入与保存防抖
 - `tests/unit/build.test.mjs`：构建两个浏览器包，校验产物文件、清单与生成的 `lang.js`
 
-测试使用 Node 内置 `node:test`，不引入测试框架。新增纯逻辑时必须补测试，优先覆盖边界与抗变形场景。
+测试使用 Node 内置 `node:test`，不引入测试框架；`options.test.mjs` 用已有开发依赖 `jsdom` 模拟配置页 DOM 与 `chrome.storage`。新增纯逻辑时必须补测试，优先覆盖边界与抗变形场景。
 
 ## 手动冒烟
 
