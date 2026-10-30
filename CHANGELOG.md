@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- 点击拦截优先使用站点配置 / 内置适配器的发送按钮，自定义站点的「发送按钮选择器」真正生效
+- 新增智谱清言（`chatglm.cn`）内置适配器，修复点击发送按钮无法拦截的问题
+
 ### Added
 
 - ESLint、Prettier、EditorConfig 与 Node 版本约束
