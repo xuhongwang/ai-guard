@@ -59,6 +59,12 @@
           'button[data-testid="send-button"], button[aria-label*="发送"], button[aria-label*="Send"], button[aria-label*="提交"]',
         ),
     },
+    'chatglm.cn': {
+      input: () =>
+        document.querySelector('#search-input-box textarea, textarea, [contenteditable="true"]'),
+      // 发送控件是无 aria-label 的 div，内部用 img 图标
+      button: () => document.querySelector('.enter.is-main-chat, .enter'),
+    },
   };
 
   // 通配符 host 匹配：*.example.com 匹配 any.example.com / a.b.example.com
@@ -92,13 +98,9 @@
               }
               return fallbackInput();
             },
-            button: () => {
-              if (buttonSel) {
-                const el = document.querySelector(buttonSel);
-                if (el) return el;
-              }
-              return fallbackButton();
-            },
+            // 配置了发送按钮选择器时只认它，不再回退，避免误判其他按钮
+            button: () => (buttonSel ? document.querySelector(buttonSel) : null),
+            hasButton: !!buttonSel,
             custom: true,
           };
         }
@@ -112,6 +114,7 @@
           return {
             input: () => adapter.input() || fallbackInput(),
             button: () => adapter.button() || fallbackButton(),
+            hasButton: true,
           };
         }
       }
@@ -120,6 +123,7 @@
     return {
       input: () => fallbackInput(),
       button: () => fallbackButton(),
+      hasButton: false,
     };
   }
   function fallbackInput() {
@@ -413,6 +417,17 @@
       if (!hasBlockingHit()) return;
       const target = elementFromEvent(e);
       if (!target) return;
+      // 优先使用站点配置 / 内置适配器的发送按钮（精确匹配，避免启发式漏判）
+      if (adapter.hasButton) {
+        const configured = adapter.button();
+        if (configured && (configured === target || configured.contains(target))) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          showBlockToast();
+          return;
+        }
+      }
       const btn = target.closest(
         'button, [role="button"], [type="submit"], input[type="submit"], ' +
           'div[aria-label], span[aria-label], a[aria-label], ' +

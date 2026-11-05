@@ -102,7 +102,7 @@ Chrome service worker 通过 `importScripts('defaults.js')` 复用默认值；Fi
 
 ## 站点适配
 
-`content-script.js` 内置 7 个适配器：ChatGPT、Claude、Copilot、Gemini、豆包、元宝、Kimi。每个适配器提供输入框与发送按钮选择器，失败时回退到通用选择器。用户可在配置页添加自定义站点（`host` 支持 `*.example.com`）。
+`content-script.js` 内置 8 个适配器：ChatGPT、Claude、Copilot、Gemini、豆包、元宝、Kimi、智谱清言。每个适配器提供输入框与发送按钮选择器，失败时回退到通用选择器。点击拦截会优先匹配当前站点配置的发送按钮（内置适配器或自定义站点的 `buttonSel`），再走通用启发式。用户可在配置页添加自定义站点（`host` 支持 `*.example.com`）。
 
 ## 已知技术债
 
